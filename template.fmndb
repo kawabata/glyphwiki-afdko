@@ -1,0 +1,10 @@
+[HanaMin-$sub]
+	f=3,1,0x411,\82b1\5712\660e\671d
+	s=3,1,0x411,$sub
+	l=3,1,0x411,\82b1\5712\660e\671d $sub
+        f=1,1,11,\89\d4\89\80\96\be\92\a9
+        s=1,1,11,$sub
+        l=1,1,11,\89\d4\89\80\96\be\92\a9 $sub
+	f=Hanazono Mincho
+	s=$sub
+	l=Hanazono Mincho $sub
