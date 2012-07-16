@@ -1,9 +1,9 @@
 [配布物]
+・README.txt
 ・Makefile
 ・dumpucs.pl
 ・makesvg.js
 ・makeSVGFont.pl
-・readme.txt
 ・template.cidinfo
 ・template.fmndb
 ・template.tables
@@ -58,6 +58,6 @@ make sub=A spec='^u00[2-7][0-9a-f]$$,^u2[ef][0-9a-f]{2}$$,^u3[014-9a-f][0-9a-f]{
 make sub=B spec='^u00[2-7][0-9a-f]$$,^u2f00$,^u30..(-vert)?$$,^u2[0-9a-f]{4}(-ue0...)?$$'
 make sub=M spec='^u00[2-7][0-9a-f]$$,^u11[0-f]{2}$$,^u2[0-9a-f]{3}$$,^u3[0-3][0-9a-f]{2}$$,^u[a-d][0-9a-f]{3}$$,^u1[0-9a-f]{4}$$,^kumimoji(-u[0-9a-f]+)+$$'
 
-make sub=Aext spec='^u00[2-7][0-9a-f],^u2[ef][0-9a-f]{2}(-.+)?$$,^u3[014-9a-f][0-9a-f]{2},^u[4-9][0-9a-f]{3},^uf[9af][0-9a-f]{2},X0213-.+,^cdp'
+make sub=Aext spec='^u00[2-7][0-9a-f],^u2[ef][0-9a-f]{2}(-.+)?$$,^u3[014-9a-f][0-9a-f]{2},^u[4-9][0-9a-f]{3},^uf[9af][0-9a-f]{2},X0213.*,^cdp'
 make sub=Bext spec='^u00[2-7][0-9a-f],^u2f00$$,^u30..$$,^u2[0-9a-f]{4}'
 make sub=Mext spec='^u00[2-7][0-9a-f],^u11[0-f]{2},^u2[0-9a-f]{3}(-.+)?$$,^u3[0-3][0-9a-f]{2},^u[a-d][0-9a-f]{3},^u1[0-9a-f]{4},^kumimoji'

@@ -10,8 +10,6 @@ spec	= ^u00[2-7][0-9a-f]$$,^u2[ef][0-9a-f]{2}$$,^u3[014-9a-f][0-9a-f]{2}(-u....)
 
 BASE    = HanaMin$(sub)
 
-all: otf
-
 dump.tar.gz:
 	wget http://glyphwiki.org/dump.tar.gz
 
@@ -55,18 +53,40 @@ $(BASE).hinted.raw: $(BASE).raw
 	perl $(PROG)/hintcidfont.pl $(PROG)/hintparam.txt < $(BASE).raw > $(BASE).hinted.raw
 	autohint -r -q $(BASE).hinted.raw >>$(BASE).log 2>>$(BASE).err
 
-# subroutinize "-S" は非常に時間がかかるので注意
 $(BASE).otf: $(BASE).fmndb $(BASE).ivs $(BASE).cmap $(BASE).hinted.raw $(BASE).features
 	makeotf -mf $(BASE).fmndb -cs 1 -ci $(BASE).ivs -ch		\
 	 $(BASE).cmap -f $(BASE).hinted.raw -ff $(BASE).features -o $@
 
+# subroutinize "-S" は非常に時間がかかるので注意
+$(BASE).s.otf: $(BASE).fmndb $(BASE).ivs $(BASE).cmap $(BASE).hinted.raw $(BASE).features
+	makeotf -S -mf $(BASE).fmndb -cs 1 -ci $(BASE).ivs -ch		\
+	 $(BASE).cmap -f $(BASE).hinted.raw -ff $(BASE).features -o $@
+
 $(BASE).pdf: $(BASE).otf
-	spot -Proof $(BASE).otf > $(BASE).ps
-	/usr/bin/pstopdf $(BASE).ps $(BASE).pdf
+	tx -pdf $(BASE).otf > $(BASE).pdf
+
+$(BASE).proof.pdf: $(BASE).otf
+	spot -Proof $(BASE).otf > $(BASE).proof.ps
+	if [ -s $(BASE).proof.ps ]; then \
+	  /usr/bin/pstopdf $(BASE).proof.ps -o $(BASE).proof.pdf; \
+	else \
+	  touch $(BASE).proof.pdf; \
+	fi
+
+$(BASE).tar.gz: $(BASE).otf $(BASE).html $(BASE).proof.pdf $(BASE).pdf
+	if [ -s $(BASE).proof.pdf ]; then \
+	  tar cvfz $(BASE).tar.gz $(BASE).otf $(BASE).html $(BASE).proof.pdf $(BASE).pdf ; \
+	else \
+	  tar cvfz $(BASE).tar.gz $(BASE).otf $(BASE).html $(BASE).pdf ; \
+	fi
 
 otf: $(BASE).otf
 
-proof: $(BASE).pdf
+proof: $(BASE).proof.pdf
+
+pdf: $(BASE).pdf
+
+all: $(BASE).tar.gz
 
 clean:
 	rm $(BASE).map $(BASE).alias $(BASE).source $(BASE).svg		\
@@ -79,4 +99,3 @@ clean:
 
 distclean: 
 	rm -r $(BASE).* dump* ./work Glyphwiki-* current.fpr checkOutlines.log*
-
