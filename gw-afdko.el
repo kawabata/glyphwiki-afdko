@@ -18,7 +18,7 @@
 (defvar gw-html-file     nil) ;; (concat gw-file-base ".html"))
 (defvar gw-ivs-file      nil) ;; (concat gw-file-base ".ivs"))
 (defvar gw-cidmap-file   nil) ;; (concat gw-file-base ".cidmap"))
-(defvar gw-features-file nil) ;; (concat gw-file-base ".features"))
+(defvar gw-features-file nil) ;; (concat gw-file-base ".tmp.features"))
 
 ;; tables
 (defvar gw-glyphname-ucs-table nil)
@@ -263,7 +263,7 @@ end
         gw-html-file     (concat gw-file-base ".html")
         gw-ivs-file      (concat gw-file-base ".ivs")
         gw-cidmap-file   (concat gw-file-base ".cidmap")
-        gw-features-file (concat gw-file-base ".features")
+        gw-features-file (concat gw-file-base ".tmp.features")
         ;; related tables
         gw-glyphname-ucs-table     (make-hash-table :test 'equal)
         gw-ucs-cid-table           (make-hash-table :test 'equal)
@@ -386,8 +386,6 @@ end
 ;;   - ligature substitution  : (char list) -> char
 
 (defun gw-register-feature (feature lang original alt target)
-  ;(if (equal feature "trad")
-  ;    (message "trad: %s %s %s %s" lang original alt target))
   (let* ((lang       (or lang "dflt"))
          (lang-table (or (gethash feature gw-feature-table)
                          (let ((new-lang-table (make-hash-table :test 'equal)))
@@ -401,8 +399,7 @@ end
       (if (gethash original orig-table)
           (message "Warning! Duplicate feature! %s" (list feature lang original alt target)))
       (unless (equal original target)
-        (puthash original target orig-table)))
-    ))
+        (puthash original target orig-table)))))
 
 ;; cf. ~/bin/FDK/Technical Documentation/topic_feature_file_syntax.html
 (defun gw-output-feature ()
@@ -468,8 +465,6 @@ end
       (if (string-match regexp glyphname)
           (puthash (gw-glyphname-to-cid glyphname) val
                    gw-cid-vmtx-table))))
-  (if (string-match "^u319" glyphname)
-      (message "debug! %s" glyphname))
   (dolist (regexp (apply 'nconc 
                          (mapcar 
                           (lambda (x) (list (elt x 0) (elt x 1))) 
@@ -488,27 +483,26 @@ end
              gw-cid-vmtx-table)
     (insert "} vmtx;\n"))
   ;; feature vkrn
-  (let (flag)
+  (let (positions)
     (dolist (item gw-vkrn-data)
       (let* ((regexp1      (elt item 0))
              (regexp1-item (gethash regexp1 gw-regexp-cid-table))
              (regexp2      (elt item 1))
-             (regexp2-item (gethash regexp2 gw-regexp-cid-table)))
-        (if (and regexp1-item regexp2-item) (setq flag t))))
-    (when flag
+             (regexp2-item (gethash regexp2 gw-regexp-cid-table))
+             (vkrn         (elt item 2)))
+        (dolist (item1 regexp1-item)
+          (dolist (item2 regexp2-item)
+            (setq positions (cons (list item1 item2 vkrn) positions))))))
+    (when positions
       (insert "\nfeature vkrn {\n")
       (insert "  script DFLT;\n")
       (insert "  language dflt;\n")
-      (dolist (item gw-vkrn-data)
-        (let* ((regexp1      (elt item 0))
-               (regexp1-item (gethash regexp1 gw-regexp-cid-table))
-               (regexp2      (elt item 1))
-               (regexp2-item (gethash regexp2 gw-regexp-cid-table))
-               (vkrn         (elt item 2)))
-          (dolist (item1 regexp1-item)
-            (dolist (item2 regexp2-item)
-              (insert (format "    position \\%d \\%d %d;\n"
-                              item1 item2 vkrn))))))
+      (dolist (position positions)
+        (let* ((first   (elt position 0))
+               (second  (elt position 1))
+               (kerning (elt position 2)))
+          (insert (format "    position \\%d \\%d %d;\n"
+                              first second kerning))))
       (insert "} vkrn; \n"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

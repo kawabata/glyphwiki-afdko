@@ -36,7 +36,7 @@ function Polygons(){
     }
     temp = temp + (polygon.array[i].x + polygon.array[0].x) * (polygon.array[0].y - polygon.array[i].y);
     temp = temp / 2;
-    if(temp < 0){
+    if(temp > 0){
         polygon.reverse();
     }
 

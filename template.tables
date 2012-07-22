@@ -9,7 +9,7 @@ table OS/2 {
   WeightClass 300;
   WidthClass 5;
   UnicodeRange 0 1 2 5 31 33 35 36 38 48 49 50 51 52 54 55 56 59 60 61 62 65 68;
-  CodePageRange 932;
+  CodePageRange 1252 932;
   FSType 0;
 } OS/2;
 
@@ -25,3 +25,7 @@ table name {
       nameid 14 "http://glyphwiki.org/license.html";
       nameid 14 3 1 0x411 "http://glyphwiki.org/license.html";
 } name;
+
+table vhea {
+  VertTypoLineGap 500;
+} vhea;

@@ -39,8 +39,12 @@ $(BASE).fmndb $(BASE).cidinfo:
 	sed -e s/\$$sub/$(sub)/ $(PROG)/template.fmndb > $(BASE).fmndb
 	sed -e s/\$$sub/$(sub)/ $(PROG)/template.cidinfo > $(BASE).cidinfo
 
-$(BASE).tmp.cmap $(BASE).ivs $(BASE).cidmap $(BASE).features $(BASE).html: $(BASE).map $(BASE).alias $(BASE).dump
+$(BASE).tmp.cmap $(BASE).ivs $(BASE).cidmap $(BASE).tmp.features $(BASE).html: $(BASE).map $(BASE).alias $(BASE).dump
 	emacs --script $(PROG)/gw-afdko.el $(BASE) >>$(BASE).log 2>>$(BASE).err
+
+$(BASE).features : $(BASE).tmp.features
+	cp $(BASE).tmp.features $(BASE).features
+	sed -n -e "/vert/,/}/p" $(BASE).tmp.features | sed -e "s/vert/vrt2/" >> $(BASE).features
 	sed -e s/\$$version/$(version)/ $(PROG)/template.tables >> $(BASE).features
 
 $(BASE).cmap : $(BASE).tmp.cmap
