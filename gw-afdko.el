@@ -32,7 +32,7 @@
 (defvar gw-feature-order '(ccmp liga locl ss00 ss01 ss02 ss03
                            ss04 ss05 ss06 ss07 ss08 ss09 ss10
                            ss11 ss12 ss13 ss14 ss15 salt trad
-                           vert))
+                           vert vrt2))
 (defvar gw-lang-regexp 
   (regexp-opt '("g" "t" "j" "k" "v" "h" "u" "us" "i" "ja" "jv" "js" "kp")))
 (defvar gw-vmtx-advanceY-data ;; VertAdvanceY
@@ -62,42 +62,6 @@
 %%BeginResource: CMap (GlyphWiki-UTF32-H)
 %%Title: (GlyphWiki-UTF32-H Adobe Identity 0)
 %%Version: 1.000
-%%Copyright: -----------------------------------------------------------
-%%Copyright: Copyright 1990-2012 Adobe Systems Incorporated.
-%%Copyright: All rights reserved.
-%%Copyright:
-%%Copyright: Redistribution and use in source and binary forms, with or
-%%Copyright: without modification, are permitted provided that the
-%%Copyright: following conditions are met:
-%%Copyright:
-%%Copyright: Redistributions of source code must retain the above
-%%Copyright: copyright notice, this list of conditions and the following
-%%Copyright: disclaimer.
-%%Copyright:
-%%Copyright: Redistributions in binary form must reproduce the above
-%%Copyright: copyright notice, this list of conditions and the following
-%%Copyright: disclaimer in the documentation and/or other materials
-%%Copyright: provided with the distribution. 
-%%Copyright:
-%%Copyright: Neither the name of Adobe Systems Incorporated nor the names
-%%Copyright: of its contributors may be used to endorse or promote
-%%Copyright: products derived from this software without specific prior
-%%Copyright: written permission. 
-%%Copyright:
-%%Copyright: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
-%%Copyright: CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-%%Copyright: INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-%%Copyright: MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-%%Copyright: DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
-%%Copyright: CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-%%Copyright: SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-%%Copyright: NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-%%Copyright: LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-%%Copyright: HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-%%Copyright: CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-%%Copyright: OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-%%Copyright: SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-%%Copyright: -----------------------------------------------------------
 %%EndComments
 
 /CIDInit /ProcSet findresource begin
@@ -406,6 +370,14 @@ end
   ;; 現在のバッファに gw-feature-table　の内容を出力する。
   (dolist (lang-script gw-lang-script)
     (insert "languagesystem " (cdr lang-script) " " (car lang-script) ";\n"))
+  (let ((vert-lang-table (gethash "vert" gw-feature-table)))
+    ;; vert を探し、なければ空vertを作る。
+    (when (null vert-lang-table)
+      (gw-register-feature "vert" nil 0 nil 0)
+      (setq vert-lang-table (gethash "vert" gw-feature-table)))
+    ;; vert をvrt2にコピーする。
+    (puthash "vrt2" (copy-hash-table vert-lang-table) gw-feature-table))
+  ;; 各featureを順に出力する。
   (dolist (feature gw-feature-order)
     (let ((lang-table (gethash (symbol-name feature) gw-feature-table)))
       (when lang-table
@@ -439,8 +411,6 @@ end
             (mapconcat 
              (lambda (x) (format "\\%d" x))
              (gw-sort-to-array target)
-             ;(mapcar 'cdr 
-             ;        (sort target (lambda (x y) (< (car x) (car y)))))
              " ")
             "]")
          ;; single/ligature substitution
@@ -475,6 +445,7 @@ end
 
 (defun gw-output-vertical ()
   ;; table vmtx
+  (goto-char (point-min)) ;; vrt2 の後に来ると `VertAdvanceY redefined' エラーが発生することがあるため。
   (when (/= 0 (hash-table-count gw-cid-vmtx-table))
     (insert "\ntable vmtx {\n")
     (maphash (lambda (cid vertAdvanceY)
@@ -483,6 +454,7 @@ end
              gw-cid-vmtx-table)
     (insert "} vmtx;\n"))
   ;; feature vkrn
+  (goto-char (point-max))
   (let (positions)
     (dolist (item gw-vkrn-data)
       (let* ((regexp1      (elt item 0))

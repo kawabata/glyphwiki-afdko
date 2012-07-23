@@ -13,7 +13,7 @@ BASE    = HanaMin$(sub)
 dump.tar.gz:
 	wget http://glyphwiki.org/dump.tar.gz
 
-# 漢文については'-vert'を追記する。
+# 漢文 (U+319X) には '-vert' を追記する。
 dump_all_versions.txt dump_newest_only.txt: dump.tar.gz
 	tar xvfz dump.tar.gz dump_all_versions.txt dump_newest_only.txt
 	touch dump_all_versions.txt
@@ -44,7 +44,6 @@ $(BASE).tmp.cmap $(BASE).ivs $(BASE).cidmap $(BASE).tmp.features $(BASE).html: $
 
 $(BASE).features : $(BASE).tmp.features
 	cp $(BASE).tmp.features $(BASE).features
-	sed -n -e "/vert/,/}/p" $(BASE).tmp.features | sed -e "s/vert/vrt2/" >> $(BASE).features
 	sed -e s/\$$version/$(version)/ $(PROG)/template.tables >> $(BASE).features
 
 $(BASE).cmap : $(BASE).tmp.cmap
@@ -58,13 +57,15 @@ $(BASE).hinted.raw: $(BASE).raw
 	autohint -r -q $(BASE).hinted.raw >>$(BASE).log 2>>$(BASE).err
 
 $(BASE).otf: $(BASE).fmndb $(BASE).ivs $(BASE).cmap $(BASE).hinted.raw $(BASE).features
-	makeotf -mf $(BASE).fmndb -cs 1 -ci $(BASE).ivs -ch		\
-	 $(BASE).cmap -f $(BASE).hinted.raw -ff $(BASE).features -o $@
+	makeotf -newNameID4 -mf $(BASE).fmndb -cs 1 -ci $(BASE).ivs	\
+	 -ch $(BASE).cmap -f $(BASE).hinted.raw -ff $(BASE).features	\
+	 -o $@
 
 # subroutinize "-S" は非常に時間がかかるので注意
 $(BASE).s.otf: $(BASE).fmndb $(BASE).ivs $(BASE).cmap $(BASE).hinted.raw $(BASE).features
-	makeotf -S -mf $(BASE).fmndb -cs 1 -ci $(BASE).ivs -ch		\
-	 $(BASE).cmap -f $(BASE).hinted.raw -ff $(BASE).features -o $@
+	makeotf -S -newNameID4 -mf $(BASE).fmndb -cs 1 -ci	\
+	 $(BASE).ivs -ch $(BASE).cmap -f $(BASE).hinted.raw -ff	\
+	 $(BASE).features -o $@
 
 $(BASE).pdf: $(BASE).otf
 	tx -pdf $(BASE).otf > $(BASE).pdf
