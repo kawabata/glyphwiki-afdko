@@ -1,7 +1,8 @@
 # GlyphWiki Font Generator
 
-PROG	= /Users/kawabata/GlyphWiki/program
-RHINO	= /Users/kawabata/GlyphWiki/program/js.jar
+PROG	= .
+PERL    = perl
+AFDKO   = $(USER)/bin/FDK/Tools/SharedData/FDKScripts/
 version = 2.$(shell date "+%m%d")
 sub	= A
 spec	= ^u00[2-7][0-9a-f]$$,^u2[ef][0-9a-f]{2}$$,^u3[014-9a-f][0-9a-f]{2}(-u....)?(-vert)?$$,^u[4-9][0-9a-f]{3}(-ue0...)?$$,^uf[9af][0-9a-f]{2}(-ue0...)?$$,X0213(-ue01..)?$$,^cdp-....$$
@@ -17,16 +18,17 @@ dump.tar.gz:
 dump_all_versions.txt dump_newest_only.txt: dump.tar.gz
 	tar xvfz dump.tar.gz dump_all_versions.txt dump_newest_only.txt
 	touch dump_all_versions.txt
-	perl -i -pe 's/^( u319[-0-9a-z]*)(.*)$$/\1\2\n\1-vert\2/' dump_newest_only.txt
+	$(PERL) -i -pe 's/^( u319[-0-9a-z]*)(.*)$$/\1\2\n\1-vert\2/' dump_newest_only.txt
 
 # 空白文字を追記する。
 $(BASE).map $(BASE).alias $(BASE).source: dump_all_versions.txt dump_newest_only.txt
-	perl $(PROG)/dumpucs.pl "$(spec)" $(BASE)
+	$(PERL) $(PROG)/dumpucs.pl "$(spec)" $(BASE)
 	echo "0u0020	0:0:0:0\n0u3000	0:0:0:0" >> $(BASE).source
 
 $(BASE).svg: $(BASE).source
-	java -jar $(RHINO) $(PROG)/makesvg.js $(BASE) 
-	perl $(PROG)/makeSVGFont.pl $(BASE) >$(BASE).log 2>$(BASE).err 
+	-rm -rf ./work
+	rhino $(PROG)/makesvg.js $(BASE)
+	$(PERL) $(PROG)/makeSVGFont.pl $(BASE) >$(BASE).log 2>$(BASE).err
 
 $(BASE).pfa: $(BASE).svg
 	tx -t1 $(BASE).svg $(BASE).pfa >>$(BASE).log 2>>$(BASE).err
@@ -47,13 +49,13 @@ $(BASE).features : $(BASE).tmp.features
 	sed -e s/\$$version/$(version)/ $(PROG)/template.tables >> $(BASE).features
 
 $(BASE).cmap : $(BASE).tmp.cmap
-	perl $(PROG)/cmap-tool.pl < $(BASE).tmp.cmap > $(BASE).cmap
+	$(PERL) $(PROG)/cmap-tool.pl < $(BASE).tmp.cmap > $(BASE).cmap
 
 $(BASE).raw: $(BASE).cidinfo $(BASE).cidmap $(BASE).pfa
 	mergeFonts -cid $(BASE).cidinfo $(BASE).raw $(BASE).cidmap $(BASE).pfa >>$(BASE).log 2>>$(BASE).err
 
 $(BASE).hinted.raw: $(BASE).raw
-	perl $(PROG)/hintcidfont.pl $(PROG)/hintparam.txt < $(BASE).raw > $(BASE).hinted.raw
+	$(PERL) $(AFDKO)/hintcidfont.pl $(PROG)/hintparam.txt < $(BASE).raw > $(BASE).hinted.raw
 	autohint -r -q $(BASE).hinted.raw >>$(BASE).log 2>>$(BASE).err
 
 $(BASE).otf: $(BASE).fmndb $(BASE).ivs $(BASE).cmap $(BASE).hinted.raw $(BASE).features
@@ -94,13 +96,13 @@ pdf: $(BASE).pdf
 all: $(BASE).tar.gz
 
 clean:
-	rm $(BASE).map $(BASE).alias $(BASE).source $(BASE).svg		\
+	-rm -rf ./work
+	-rm $(BASE).map $(BASE).alias $(BASE).source $(BASE).svg		\
 	  $(BASE).pfa $(BASE).dump $(BASE).fmndb $(BASE).cidmap		\
 	  $(BASE).cidinfo $(BASE).cmap $(BASE).tmp.cmap $(BASE).raw	\
 	  $(BASE).hinted.raw $(BASE).log $(BASE).err $(BASE).features	\
 	  $(BASE).ivs $(BASE).ps current.fpr checkOutlines.log*		\
 	 GlyphWiki-*
-	rm -r ./work
 
-distclean: 
+distclean:
 	rm -r $(BASE).* dump* ./work Glyphwiki-* current.fpr checkOutlines.log*

@@ -2,11 +2,13 @@
 
 # This tool was written by Dr. Ken Lunde, Adobe Systems Incorporated
 # lunde@adobe.com
+#
+# Version 10/26/2013
+#
+# Changed call to the deprecated ctime.pl module to the more proper
+# localtime function.
 
-require "ctime.pl";
-
-chomp($date = &ctime(time));
-($year) = (split(/\s+/,$date))[4];
+$year = (localtime)[5] + 1900;
 
 $expand = $expanded = 0;
 $outfile = "STDOUT";

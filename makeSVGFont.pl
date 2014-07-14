@@ -1,13 +1,13 @@
-﻿use utf8;
+﻿# Create SVG Font from KAGE SVG data.
 
-# コマンドライン引数チェック
+use utf8;
+
 if($#ARGV != 0){
   print "ERROR: input the target name\n";
   exit;
 }
 $TARGET = @ARGV[0];
 
-# いくつかの情報
 $TARGET_DIR = ".";
 $WORK_DIR = "$TARGET_DIR/work";
 
