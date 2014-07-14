@@ -2,7 +2,7 @@
 
 PROG	= .
 PERL    = perl
-AFDKO   = $(USER)/bin/FDK/Tools/SharedData/FDKScripts/
+AFDKO   = $(HOME)/bin/FDK/Tools/SharedData/FDKScripts/
 version = 2.$(shell date "+%m%d")
 sub	= A
 spec	= ^u00[2-7][0-9a-f]$$,^u2[ef][0-9a-f]{2}$$,^u3[014-9a-f][0-9a-f]{2}(-u....)?(-vert)?$$,^u[4-9][0-9a-f]{3}(-ue0...)?$$,^uf[9af][0-9a-f]{2}(-ue0...)?$$,X0213(-ue01..)?$$,^cdp-....$$
