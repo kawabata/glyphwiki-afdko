@@ -3,6 +3,10 @@ table head {
     FontRevision $version;
 } head;
 
+table hhea {
+    LineGap 500;
+} hhea;
+
 table OS/2 {
   TypoAscender 880;
   TypoDescender -120;
