@@ -3,10 +3,10 @@
 use utf8;
 
 # USAGE: dumpucs.pl regexps <output>
-# e.g. dumpucs.pl ^u[2-9][0-9a-f]{3},^uf[9a][0-9a-f]{3},^cdp,^kumimoji HanaMinA
-# e.g. dumpucs.pl ^u2[0-9a-f]{4} HanaMinB
+# e.g. dumpucs.pl '^u[2-9][0-9a-f]{3}:^uf[9a][0-9a-f]{3}:^cdp,:kumimoji' HanaMinA
+# e.g. dumpucs.pl '^u2[0-9a-f]{4}' HanaMinB
 
-my @regexps = split(/,/,$ARGV[0]);
+my @regexps = split(/:/,$ARGV[0]);
 
 my $fontname = $ARGV[1];
 

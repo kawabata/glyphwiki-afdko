@@ -1,11 +1,14 @@
-# GlyphWiki Font Generator
+# GlyphWiki Font Generator -*- mode: Makefile -*-
 
 PROG	= .
 PERL    = perl
 AFDKO   = $(HOME)/bin/FDK/Tools/SharedData/FDKScripts/
+PSTOPDF = $(shell which epstopdf || which pstopdf)
 version = 2.$(shell date "+%m%d")
 sub	= A
-spec	= ^u00[2-7][0-9a-f]$$,^u2[ef][0-9a-f]{2}$$,^u3[014-9a-f][0-9a-f]{2}(-u....)?(-vert)?$$,^u[4-9][0-9a-f]{3}(-ue0...)?$$,^uf[9af][0-9a-f]{2}(-ue0...)?$$,X0213(-ue01..)?$$,^cdp-....$$
+spec	= '^u00[2-7][0-9a-f]$$:^u[2-9f][0-9a-f]{3}(-u[0-9a-f]{4,5})?(-(j[av]|kp|us|[ghjktuv]))?(-vert)?$$:^X0213(-u[0-9a-f]{4,5})?$$:^cdp-....$$'
+# 下記を -S に設定すると、makeotf で subroutinze されるが、莫大な実行時間が必要になる。
+subrtnz =
 
 # ---
 
@@ -20,9 +23,10 @@ dump_all_versions.txt dump_newest_only.txt: dump.tar.gz
 	touch dump_all_versions.txt
 	$(PERL) -i -pe 's/^( u319[-0-9a-z]*)(.*)$$/\1\2\n\1-vert\2/' dump_newest_only.txt
 
-# 空白文字を追記する。
+# 空白文字を追記し、ufff[ef]を削除する。
 $(BASE).map $(BASE).alias $(BASE).source: dump_all_versions.txt dump_newest_only.txt
 	$(PERL) $(PROG)/dumpucs.pl "$(spec)" $(BASE)
+	perl -pi -e '$$_="" if /^0ufff[ef]/' $(BASE).source
 	echo "0u0020	0:0:0:0\n0u3000	0:0:0:0" >> $(BASE).source
 
 $(BASE).svg: $(BASE).source
@@ -59,15 +63,9 @@ $(BASE).hinted.raw: $(BASE).raw
 	autohint -r -q $(BASE).hinted.raw >>$(BASE).log 2>>$(BASE).err
 
 $(BASE).otf: $(BASE).fmndb $(BASE).ivs $(BASE).cmap $(BASE).hinted.raw $(BASE).features
-	makeotf -newNameID4 -mf $(BASE).fmndb -cs 1 -ci $(BASE).ivs	\
-	 -ch $(BASE).cmap -f $(BASE).hinted.raw -ff $(BASE).features	\
-	 -o $@
-
-# subroutinize "-S" は非常に時間がかかるので注意
-$(BASE).s.otf: $(BASE).fmndb $(BASE).ivs $(BASE).cmap $(BASE).hinted.raw $(BASE).features
-	makeotf -S -newNameID4 -mf $(BASE).fmndb -cs 1 -ci	\
-	 $(BASE).ivs -ch $(BASE).cmap -f $(BASE).hinted.raw -ff	\
-	 $(BASE).features -o $@
+	makeotf $(subrtnz) -newNameID4 -mf $(BASE).fmndb -cs 1 -ci	\
+	$(BASE).ivs -ch $(BASE).cmap -f $(BASE).hinted.raw -ff		\
+	$(BASE).features -o $@
 
 $(BASE).pdf: $(BASE).otf
 	tx -pdf $(BASE).otf > $(BASE).pdf
@@ -75,17 +73,19 @@ $(BASE).pdf: $(BASE).otf
 $(BASE).proof.pdf: $(BASE).otf
 	spot -Proof $(BASE).otf > $(BASE).proof.ps
 	if [ -s $(BASE).proof.ps ]; then \
-	  /usr/bin/pstopdf $(BASE).proof.ps -o $(BASE).proof.pdf; \
+	  $(PSTOPDF) $(BASE).proof.ps -o $(BASE).proof.pdf; \
 	else \
 	  touch $(BASE).proof.pdf; \
 	fi
 
-$(BASE).tar.gz: $(BASE).otf $(BASE).html $(BASE).proof.pdf $(BASE).pdf
+$(BASE).tar.xz: $(BASE).otf $(BASE).html $(BASE).proof.pdf $(BASE).pdf
 	if [ -s $(BASE).proof.pdf ]; then \
-	  tar cvfz $(BASE).tar.gz $(BASE).otf $(BASE).html $(BASE).proof.pdf $(BASE).pdf ; \
+	  tar cvfJ $(BASE).tar.xz $(BASE).otf $(BASE).html $(BASE).proof.pdf $(BASE).pdf $(BASE).cmap ; \
 	else \
-	  tar cvfz $(BASE).tar.gz $(BASE).otf $(BASE).html $(BASE).pdf ; \
+	  tar cvfJ $(BASE).tar.xz $(BASE).otf $(BASE).html $(BASE).pdf $(BASE).cmap ; \
 	fi
+
+.PHONY: otf proof pdf all clean distclean
 
 otf: $(BASE).otf
 
@@ -93,16 +93,12 @@ proof: $(BASE).proof.pdf
 
 pdf: $(BASE).pdf
 
-all: $(BASE).tar.gz
+all: otf proof pdf
 
 clean:
 	-rm -rf ./work
-	-rm $(BASE).map $(BASE).alias $(BASE).source $(BASE).svg		\
-	  $(BASE).pfa $(BASE).dump $(BASE).fmndb $(BASE).cidmap		\
-	  $(BASE).cidinfo $(BASE).cmap $(BASE).tmp.cmap $(BASE).raw	\
-	  $(BASE).hinted.raw $(BASE).log $(BASE).err $(BASE).features	\
-	  $(BASE).ivs $(BASE).ps current.fpr checkOutlines.log*		\
-	 GlyphWiki-*
+	find . \( -name "$(BASE).*" -not -name "*.pdf" -not -name "*.otf" -not -name "*.tar.xz" \) -exec rm {} \;
+	rm checkOutlines.log* GlyphWiki-* current.fpr
 
-distclean:
+distclean: clean
 	rm -r $(BASE).* dump* ./work Glyphwiki-* current.fpr checkOutlines.log*

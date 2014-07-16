@@ -13,7 +13,7 @@ $WORK_DIR = "$TARGET_DIR/work";
 
 open FH, ">:utf8", "$TARGET_DIR/$TARGET.svg";
 opendir(DIR, $WORK_DIR);
-print FH qq|<font horiz-adv-x="1000">\n<font-face font-family="GlyphWiki" units-per-em="1000" ascent="880" descent="120"/>\n<missing-glyph />\n|;
+print FH qq|<font horiz-adv-x="1000">\n<font-face font-family="$TARGET-GlyphWiki" units-per-em="1000" ascent="880" descent="120"/>\n<missing-glyph />\n|;
 while(defined($dir = readdir(DIR))){
   if($dir !~ m/\.svg/){
     next;
