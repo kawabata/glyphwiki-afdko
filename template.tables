@@ -3,23 +3,19 @@ table head {
     FontRevision $version;
 } head;
 
-table hhea {
-    LineGap 500;
-} hhea;
-
 table OS/2 {
   TypoAscender 880;
   TypoDescender -120;
+  TypoLineGap 0;
   WeightClass 300;
   WidthClass 5;
-  UnicodeRange 0 1 2 5 31 33 35 36 38 48 49 50 51 52 54 55 56 59 60 61 62 65 68;
   CodePageRange 1252 932;
   FSType 0;
 } OS/2;
 
 table name {
-      nameid 0 "2007-2012 GlyphWiki. All Rights Reserved.";
-      nameid 0 3 1 0x411 "2007-2012 GlyphWiki. All Rights Reserved.";
+      nameid 0 "2007-2014 GlyphWiki. All Rights Reserved.";
+      nameid 0 3 1 0x411 "2007-2014 GlyphWiki. All Rights Reserved.";
       nameid 7 "Hanazono Mincho is not yet a trademark of GlyphWiki.";
       nameid 7 3 1 0x411 "Hanazono Mincho is not yet a trademark of GlyphWiki.";
       nameid 9 "KAMICHI Koichi; KAWABATA Taichi";

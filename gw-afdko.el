@@ -7,7 +7,7 @@
 
 ;; basic definitions
 (defvar gw-base        "HanaMinA")
-(defvar gw-file-base   (expand-file-name 
+(defvar gw-file-base   (expand-file-name
                         (concat "~/work/HanaMin/" gw-base "/" gw-base)))
 ;; input files
 (defvar gw-map-file    nil) ;; (concat gw-file-base ".map"))
@@ -33,7 +33,7 @@
                            ss04 ss05 ss06 ss07 ss08 ss09 ss10
                            ss11 ss12 ss13 ss14 ss15 salt trad
                            vert vrt2))
-(defvar gw-lang-regexp 
+(defvar gw-lang-regexp
   (regexp-opt '("g" "t" "j" "k" "v" "h" "u" "us" "i" "ja" "jv" "js" "kp")))
 (defvar gw-vmtx-advanceY-data ;; VertAdvanceY
   '(("^u319.+-vert$" . 500)))
@@ -43,8 +43,8 @@
 
 ;; "js" "m" "kp" "i" は後でサポート
 (defvar gw-lang
-  '(("j" . "jan")  ("ja" . "jan") ("js" . "jan") ("jv" . "jan") 
-    ("g" . "zhs")  ("t"  . "zht") ("h"  . "zhh") ("k"  . "kor") 
+  '(("j" . "jan")  ("ja" . "jan") ("js" . "jan") ("jv" . "jan")
+    ("g" . "zhs")  ("t"  . "zht") ("h"  . "zhh") ("k"  . "kor")
     ("kp" . "kor") ("v" . "vie")  ("u"  . "eng")))
 (defvar gw-lang-script
   '(("dflt" . "DFLT")
@@ -55,7 +55,7 @@
     ("jan" . "ja")   ("zhs" . "zh")   ("zht" . "zh_TW") ("zhh" . "zh_HK")
     ("kor" . "ko")   ("vie" . "vn")   ("eng" . "en")))
 
-(defvar gw-cmap-preamble 
+(defvar gw-cmap-preamble
 "%!PS-Adobe-3.0 Resource-CMap
 %%DocumentNeededResources: ProcSet (CIDInit)
 %%IncludeResource: ProcSet (CIDInit)
@@ -179,7 +179,7 @@ end
   ;; % cmap-tool.pl < XXX.tmp.cmap > XXX.cmap
   (with-temp-file gw-cmap-file
     (insert gw-cmap-preamble)
-    (maphash 
+    (maphash
      (lambda (ucs cid)
        (when (< ucs #xf0000)
          (insert (format "<%08x> %d\n" ucs cid))))
@@ -187,11 +187,12 @@ end
     (insert gw-cmap-postscript))
   ;; output IVS file
   (with-temp-file gw-ivs-file
-    (maphash 
+    (maphash
      (lambda (glyphname ucs)
-       (when (string-match "^u\\([0-9a-f]+\\)-u\\(e01[0-9a-f][0-9a-f]\\)$" glyphname)
+       (when (or (string-match "^u\\([0-9a-f]+\\)-u\\(e01[0-9a-f][0-9a-f]\\)$" glyphname)
+                 (string-match "^u\\([0-9a-f]+\\)-u\\(fe0[0-9a-f]\\)$" glyphname))
          (insert (format "%s %s; Adobe-Japan1; CID+%d\n"
-                         (upcase (match-string 1 glyphname)) 
+                         (upcase (match-string 1 glyphname))
                          (upcase (match-string 2 glyphname))
                          (gethash ucs gw-ucs-cid-table)))))
      gw-glyphname-ucs-table))
@@ -209,7 +210,7 @@ end
   (with-temp-file gw-html-file
     (insert (format gw-html-preamble gw-base))
     (goto-char (point-max))
-    (maphash 
+    (maphash
      (lambda (glyphname features)
        (if (not (string-match "^u[0-9a-f]+$" glyphname))
            (insert (gw-font-html-table-row glyphname) "\n")))
@@ -252,13 +253,13 @@ end
       cid)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; features 
+;; features
 
 (defun gw-process-feature (glyphname)
   (let* ((analysis    (gw-analyze-feature glyphname))
          (parents       (car analysis))
          (relation      (cdr analysis))
-         (feature-set (and analysis 
+         (feature-set (and analysis
                            (gw-relation-to-feature-set relation)))
          (feature       (car feature-set))
          (lang          (elt feature-set 1))
@@ -271,7 +272,7 @@ end
           ((null feature-set) (message "improper relation %s" relation) nil)
           ((null parents-cid) (message "improper parents-cid %s" parents) nil)
           ((null cid) (message "improper cid %s" glyphname) nil)
-          (t 
+          (t
            (puthash glyphname (list parents feature lang alt)
                     gw-glyphname-feature-table)
            (gw-register-feature feature lang parents-cid alt cid)))))
@@ -280,20 +281,20 @@ end
   ;; relation から、(feature lang alt) を返す。
   (cond ((null relation) nil)
         ((equal relation "-vert") '("vert"))
-        ((string-match "^-var-\\([0-9]+\\)$" relation) 
+        ((string-match "^-var-\\([0-9]+\\)$" relation)
          (list "salt" nil (string-to-number (match-string 1 relation))))
-        ((string-match "^-itaiji-\\([0-9]+\\)$" relation) 
+        ((string-match "^-itaiji-\\([0-9]+\\)$" relation)
          (list "trad" nil (string-to-number (match-string 1 relation))))
         ((string-match "^-\\([0-9][0-9]\\)$" relation)
          (list (concat "ss" (match-string 1 relation))))
-        ((string-match "^-\\(j[av]\\|kp\\|us\\|[g-kmtuv]\\)\\([0-9][0-9]\\)$" 
+        ((string-match "^-\\(j[av]\\|kp\\|us\\|[g-kmtuv]\\)\\([0-9][0-9]\\)$"
                        relation)
-         (list (concat "ss" (match-string 2 relation)) 
+         (list (concat "ss" (match-string 2 relation))
                (cdr (assoc (match-string 1 relation) gw-lang))))
         ((string-match "^-\\(j[av]\\|kp\\|us\\|[g-kmtuv]\\)$" relation)
          (list "locl" (cdr (assoc (match-string 1 relation) gw-lang))))
-        ((or (equal "ivs" relation) 
-             (equal "ccmp" relation) 
+        ((or (equal "ivs" relation)
+             (equal "ccmp" relation)
              (equal "liga" relation))
          (list relation))
         (t (error "imporper relation! %s" relation))))
@@ -324,8 +325,9 @@ end
             (lang-comp (setq parents (concat base1 base2)
                              relation lang-comp))
             (base2     (setq parents (gw-split-base-glyphs (concat base1 base2))
-                             relation 
-                             (cond ((string-match "^-ue0" base2) "ivs")
+                             relation
+                             (cond ((string-match "^-ue01" base2) "ivs")
+                                   ((string-match "^-ufe0" base2) "ivs")
                                    ((string-match "^u2ff" base1) "ccmp")
                                    (t "liga")))))
       (cons parents relation))
@@ -371,21 +373,22 @@ end
   (dolist (lang-script gw-lang-script)
     (insert "languagesystem " (cdr lang-script) " " (car lang-script) ";\n"))
   (let ((vert-lang-table (gethash "vert" gw-feature-table)))
-    ;; vert を探し、なければ空vertを作る。
-    (when (null vert-lang-table)
-      (gw-register-feature "vert" nil 0 nil 0)
-      (setq vert-lang-table (gethash "vert" gw-feature-table)))
-    ;; vert をvrt2にコピーする。
-    (puthash "vrt2" (copy-hash-table vert-lang-table) gw-feature-table))
+    ;;;; vert がなければ空vertを作る。
+    ;;;;(when (null vert-lang-table)
+    ;;;;  (gw-register-feature "vert" nil 0 nil 0)
+    ;;;;  (setq vert-lang-table (gethash "vert" gw-feature-table)))
+    ;; vert があればvrt2にコピーする。
+    (when vert-lang-table
+      (puthash "vrt2" (copy-hash-table vert-lang-table) gw-feature-table)))
   ;; 各featureを順に出力する。
   (dolist (feature gw-feature-order)
     (let ((lang-table (gethash (symbol-name feature) gw-feature-table)))
       (when lang-table
         (insert (format "feature %s {\n" feature))
         (let ((dflt-table (gethash "dflt" lang-table)))
-          (if dflt-table 
+          (if dflt-table
               (gw-output-feature-lang "dflt" dflt-table)))
-        (maphash 
+        (maphash
          (lambda (lang orig-table)
            (if (not (equal lang "dflt"))
                (gw-output-feature-lang lang orig-table)))
@@ -393,22 +396,22 @@ end
         (insert "} " (symbol-name feature) ";\n")))))
 
 (defun gw-output-feature-lang (lang orig-table)
-  (when lang 
+  (when lang
     (insert "  script " (cdr (assoc lang gw-lang-script)) ";\n")
     (insert "  language " lang ";\n"))
-  (maphash 
+  (maphash
    (lambda (orig target)
      (insert
-      (format 
+      (format
        "    substitute %s %s;\n"
        (if (integerp orig) (format "\\%d" orig) ;; single/alternate sub.
          ;; ligature substitution
          (mapconcat (lambda (x) (format "\\%d" x)) orig " "))
        (if (listp target)
            ;; alternate substitution
-           (concat 
-            "from [" 
-            (mapconcat 
+           (concat
+            "from ["
+            (mapconcat
              (lambda (x) (format "\\%d" x))
              (gw-sort-to-array target)
              " ")
@@ -435,9 +438,9 @@ end
       (if (string-match regexp glyphname)
           (puthash (gw-glyphname-to-cid glyphname) val
                    gw-cid-vmtx-table))))
-  (dolist (regexp (apply 'nconc 
-                         (mapcar 
-                          (lambda (x) (list (elt x 0) (elt x 1))) 
+  (dolist (regexp (apply 'nconc
+                         (mapcar
+                          (lambda (x) (list (elt x 0) (elt x 1)))
                           gw-vkrn-data)))
     (if (string-match regexp glyphname)
         (addhash regexp (gw-glyphname-to-cid glyphname)
@@ -449,7 +452,7 @@ end
   (when (/= 0 (hash-table-count gw-cid-vmtx-table))
     (insert "\ntable vmtx {\n")
     (maphash (lambda (cid vertAdvanceY)
-               (insert (format "  VertAdvanceY \\%d %d;\n" 
+               (insert (format "  VertAdvanceY \\%d %d;\n"
                                cid vertAdvanceY)))
              gw-cid-vmtx-table)
     (insert "} vmtx;\n"))
@@ -487,7 +490,7 @@ end
          (lang-html (if lang (cdr (assoc lang gw-lang-html))))
          (features-html
           (if features
-              (mapconcat 
+              (mapconcat
                (lambda (x)
                  (let ((feature (car x))
                        (alt (cdr x)))
@@ -495,12 +498,12 @@ end
                            (if alt (format " %d" alt) ""))))
                  features ","))))
     ; glyphname lang features
-    (concat "<tr><td>" glyphname  
+    (concat "<tr><td>" glyphname
             "</td><td>" (or lang-html "")
-            "</td><td>" (or features-html "") 
+            "</td><td>" (or features-html "")
             "</td><td class='HanaMin'"
             (if lang-html (concat " lang='" lang-html "'") "")
-            (if features-html 
+            (if features-html
                 (concat " style=\"-webkit-font-feature-settings: "
                         features-html ";\"") "")
             ">" chars "</td></tr>")))
@@ -522,7 +525,7 @@ end
             (list (apply 'string (mapcar 'gw-uname-to-ucs parent))
                   (or lang lang2)
                   (cons (cons feature alt) features))
-          (gw-font-features parent (or lang lang2) 
+          (gw-font-features parent (or lang lang2)
                             (cons (cons feature alt) features)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -532,12 +535,12 @@ end
   (cond
    ((string-match "^u\\([0-9a-f]+\\)$" gw-name)
     (string-to-number (match-string 1 gw-name) 16))
-   ((string-match 
+   ((string-match
      "^cdp-\\([0-9a-f][0-9a-f]\\)\\([0-9a-f][0-9a-f]\\)$" gw-name)
     (let* ((h (string-to-number (match-string 1 gw-name) 16))
            (l (string-to-number (match-string 2 gw-name) 16))
            (ucs (+ #xeeb8 (* 157 (- h #x81)))))
-      (setq ucs 
+      (setq ucs
             (if (< l #x80) (+ ucs l (- #x40)) (+ ucs l (- #x62))))
       ucs))
    (t (error "not proper char name!"))))
@@ -565,5 +568,5 @@ end
           gw-base        (file-name-nondirectory gw-file-base))
     (gw-setup)))
 
-;; whenn invoked from command line
+;; when invoked from command line
 (when argv (gw-afdko-main argv))
