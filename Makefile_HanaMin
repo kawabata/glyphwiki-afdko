@@ -101,4 +101,4 @@ clean:
 	rm checkOutlines.log* GlyphWiki-* current.fpr
 
 distclean: clean
-	rm -r $(BASE).* dump* ./work Glyphwiki-* current.fpr checkOutlines.log*
+	rm -rf $(BASE).* dump*.txt ./work Glyphwiki-* current.fpr checkOutlines.log* *.tar.gz
