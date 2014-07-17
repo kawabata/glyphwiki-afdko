@@ -43,17 +43,17 @@
 
 ;; "js" "m" "kp" "i" は後でサポート
 (defvar gw-lang
-  '(("j" . "jan")  ("ja" . "jan") ("js" . "jan") ("jv" . "jan")
-    ("g" . "zhs")  ("t"  . "zht") ("h"  . "zhh") ("k"  . "kor")
-    ("kp" . "kor") ("v" . "vie")  ("u"  . "eng")))
+  '(("j" . "JAN")  ("ja" . "JAN") ("js" . "JAN") ("jv" . "JAN")
+    ("g" . "ZHS")  ("t"  . "ZHT") ("h"  . "ZHH") ("k"  . "KOR")
+    ("kp" . "KOR") ("v" . "VIE")  ("u"  . "ENG")))
 (defvar gw-lang-script
   '(("dflt" . "DFLT")
-    ("jan" . "hani") ("zhs" . "hani") ("zht" . "hani") ("zhh" . "hani")
-    ("kor" . "hani") ("vie" . "hani") ("eng" . "hani")))
+    ("JAN" . "hani") ("ZHS" . "hani") ("ZHT" . "hani") ("ZHH" . "hani")
+    ("KOR" . "hani") ("VIE" . "hani") ("ENG" . "hani")))
 (defvar gw-lang-html
   '(("dflt" . "DFLT")
-    ("jan" . "ja")   ("zhs" . "zh")   ("zht" . "zh_TW") ("zhh" . "zh_HK")
-    ("kor" . "ko")   ("vie" . "vn")   ("eng" . "en")))
+    ("JAN" . "ja")   ("ZHS" . "zh")   ("ZHT" . "zh_TW") ("ZHH" . "zh_HK")
+    ("KOR" . "ko")   ("VIE" . "vn")   ("ENG" . "en")))
 
 (defvar gw-cmap-preamble
 "%!PS-Adobe-3.0 Resource-CMap
