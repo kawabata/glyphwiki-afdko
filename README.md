@@ -8,8 +8,10 @@ This is a tool to produce the fonts from [GlyphWiki](http://glyphwiki.org).
 
 ## Usage
 
-You need AFDKO, Emacs (24.2 or later), Rhino, perl, zsh, some basic
-Unix tools, 2Gbyte of disk space and internet connection.
+You need [AFDKO](http://www.adobe.com/jp/devnet/opentype/afdko.html),
+Emacs (24.2 or later),
+[Rhino](https://developer.mozilla.org/ja/docs/Rhino), perl, wget, some
+basic Unix tools, 2Gbyte of disk space and internet connection.
 
 Then, run the following commands.
 
@@ -26,7 +28,7 @@ Note that "spec" is a regular expression to match for GlyphWiki name.
 When make command fails, there may be some empty files, which you
 should remove to avoid unexpected error.
 
-    find . -type f -empty
+    find . -type f -empty -delete
 
 For details of this tool, please refer the paper in
 http://www.atypi.org/past-conferences/hong-kong-2012/programme/11-oct-type-technologies-workshops/activity?a=154
@@ -43,5 +45,5 @@ Kage Engine is taken from Kage
 Opentype Font Developer's Kit ("Fdk") License Agreement, see
 (http://www.adobe.com/jp/devnet/opentype/afdko/eula.html)
 
-For the license of the fonts, please refer
+For the license of the generated fonts, please refer
 [GlyphWiki License](http://en.glyphwiki.org/wiki/GlyphWiki:License).
