@@ -6,9 +6,9 @@
 ;; % emacs --script $DIR/gw-afdko.el gw000000
 
 ;; basic definitions
-(defvar gw-base        "HanaMinA")
-(defvar gw-file-base   (expand-file-name
-                        (concat "~/work/HanaMin/" gw-base "/" gw-base)))
+(defvar gw-base      nil) ;; "HanaMinA")
+(defvar gw-file-base nil) ;;  (expand-file-name
+                          ;;   (concat "~/work/HanaMin/" gw-base "/" gw-base)))
 ;; input files
 (defvar gw-map-file    nil) ;; (concat gw-file-base ".map"))
 (defvar gw-alias-file  nil) ;; (concat gw-file-base ".alias"))
