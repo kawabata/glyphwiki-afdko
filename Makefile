@@ -31,6 +31,9 @@ HanaMinBX.otf:
 HanaMinAFDKO.tar.xz: HanaMinA.otf HanaMinB.otf HanaMinA.proof.pdf HanaMinB.proof.pdf
 	tar cvfJ HanaMinAFDKO.tar.xz HanaMinA.otf HanaMinB.otf README.md HanaMinA.proof.pdf HanaMinB.proof.pdf HanaMinA.cmap HanaMinB.cmap
 
+install:
+	cp HanaMinAFDKO.tar.xz $(HOME)/Dropbox/Public/HanaMinAFDKO-$(version).tar.xz
+
 clean:
 	-make -f Makefile_HanaMin sub=A clean
 	-make -f Makefile_HanaMin sub=B clean

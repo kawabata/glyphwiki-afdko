@@ -4,7 +4,7 @@ PROG	= .
 PERL    = perl
 AFDKO   = $(HOME)/bin/FDK/Tools/SharedData/FDKScripts/
 PSTOPDF = $(shell which epstopdf || which pstopdf)
-version = 2.$(shell date "+%m%d")
+version = $(shell date "+%y.%m%d" | cut -c2-6)
 sub	= A
 spec	= '^u00[2-7][0-9a-f]$$:^u[2-9f][0-9a-f]{3}(-u[0-9a-f]{4,5})?(-(j[av]|kp|us|[ghjktuv]))?(-vert)?$$:^X0213(-u[0-9a-f]{4,5})?$$:^cdp-....$$'
 # 下記を -S に設定すると、makeotf で subroutinze されるが、莫大な実行時間が必要になる。

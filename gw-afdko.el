@@ -545,18 +545,6 @@ end
       ucs))
    (t (error "not proper char name!"))))
 
-;(defun gw-encode-ucs-region ()
-;  (interactive)
-;  (while (re-search-forward "\\([ -�]\\)" nil t) ;; all non-ascii BMP
-;    (replace-match (format "\\%04x" (string-to-char (match-string 1))) nil t)))
-;(defun gw-encode-sjis-region ()
-;  (interactive)
-;  (while (re-search-forward "\\([ -�]\\)" nil t)
-;    (let* ((str (encode-coding-string (match-string 1) 'shift_jis))
-;           (str1 (string-to-char (substring str 0 1)))
-;           (str2 (string-to-char (substring str 1 2))))
-;      (replace-match (format "\\%02x\\%02x" str1 str2) nil t))))
-
 ;; --------------------------
 ;; commad-line main function
 
