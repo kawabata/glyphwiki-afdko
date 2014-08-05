@@ -3,7 +3,7 @@
 PROG	= .
 PERL    = perl
 AFDKO   = $(HOME)/bin/FDK/Tools/SharedData/FDKScripts/
-PSTOPDF = $(shell which epstopdf || which pstopdf)
+PS2PDF  = ps2pdf
 version = $(shell date "+%y.%m%d" | cut -c2-6)
 sub	= A
 spec	= '^u00[2-7][0-9a-f]$$:^u[2-9f][0-9a-f]{3}(-u[0-9a-f]{4,5})?(-(j[av]|kp|us|[ghjktuv]))?(-vert)?$$:^X0213(-u[0-9a-f]{4,5})?$$:^cdp-....$$'
@@ -26,7 +26,7 @@ dump_all_versions.txt dump_newest_only.txt: dump.tar.gz
 # 空白文字を追記し、ufff[ef]を削除する。
 $(BASE).map $(BASE).alias $(BASE).source: dump_all_versions.txt dump_newest_only.txt
 	$(PERL) $(PROG)/dumpucs.pl "$(spec)" $(BASE)
-	perl -pi -e '$$_="" if /^0ufff[ef]/' $(BASE).source
+	$(PERL) -pi -e '$$_="" if /^0ufff[ef]/' $(BASE).source
 	echo "0u0020	0:0:0:0\n0u3000	0:0:0:0" >> $(BASE).source
 
 $(BASE).svg: $(BASE).source
@@ -73,7 +73,7 @@ $(BASE).pdf: $(BASE).otf
 $(BASE).proof.pdf: $(BASE).otf
 	spot -Proof $(BASE).otf > $(BASE).proof.ps
 	if [ -s $(BASE).proof.ps ]; then \
-	  $(PSTOPDF) $(BASE).proof.ps -o $(BASE).proof.pdf; \
+	  $(PS2PDF) $(BASE).proof.ps $(BASE).proof.pdf; \
 	else \
 	  touch $(BASE).proof.pdf; \
 	fi
@@ -93,7 +93,7 @@ proof: $(BASE).proof.pdf
 
 pdf: $(BASE).pdf
 
-all: otf proof pdf
+all: otf
 
 clean:
 	-rm -rf ./work

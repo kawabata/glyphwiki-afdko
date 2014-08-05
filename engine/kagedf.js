@@ -7,7 +7,7 @@ function dfDrawFont(kage, polygons, a1, a2, a3, x1, y1, x2, y2, x3, y3, x4, y4){
     case 0:
       break;
     case 1:
-      if(a3 == 4){
+      if(a3 % 100 == 4){
         if(x1 == x2){
           if(y1 < y2){ v = 1; } else{ v = -1; }
           tx1 = x2;
@@ -25,7 +25,7 @@ function dfDrawFont(kage, polygons, a1, a2, a3, x1, y1, x2, y2, x3, y3, x4, y4){
           ty1 = y2 - kage.kMage * Math.sin(rad) * v;
         }
         cdDrawLine(kage, polygons, x1, y1, tx1, ty1, a2, 1);
-        cdDrawCurve(kage, polygons, tx1, ty1, x2, y2, x2 - kage.kMage * (((kage.kAdjustTateStep + 4) - Math.floor(a2 / 1000)) / (kage.kAdjustTateStep + 4)), y2, 1 + (a2 - a2 % 1000), 14);
+        cdDrawCurve(kage, polygons, tx1, ty1, x2, y2, x2 - kage.kMage * (((kage.kAdjustTateStep + 4) - Math.floor(a2 / 1000)) / (kage.kAdjustTateStep + 4)), y2, 1 + (a2 - a2 % 1000), a3 + 10);
       }
       else{
         cdDrawLine(kage, polygons, x1, y1, x2, y2, a2, a3);
@@ -33,7 +33,7 @@ function dfDrawFont(kage, polygons, a1, a2, a3, x1, y1, x2, y2, x3, y3, x4, y4){
       break;
     case 2:
     //case 12: // ... no need
-      if(a3 == 4){
+      if(a3 % 100 == 4){
         if(x2 == x3){
           tx1 = x3;
           ty1 = y3 - kage.kMage;
@@ -49,7 +49,7 @@ function dfDrawFont(kage, polygons, a1, a2, a3, x1, y1, x2, y2, x3, y3, x4, y4){
           ty1 = y3 - kage.kMage * Math.sin(rad) * v;
         }
         cdDrawCurve(kage, polygons, x1, y1, x2, y2, tx1, ty1, a2, 1);
-        cdDrawCurve(kage, polygons, tx1, ty1, x3, y3, x3 - kage.kMage, y3, 1, 14);
+        cdDrawCurve(kage, polygons, tx1, ty1, x3, y3, x3 - kage.kMage, y3, 1, a3 + 10);
       }
       else if(a3 == 5){
         cdDrawCurve(kage, polygons, x1, y1, x2, y2, x3, y3, a2, 15);
@@ -229,7 +229,7 @@ function dfDrawFont(kage, polygons, a1, a2, a3, x1, y1, x2, y2, x3, y3, x4, y4){
       }
       break;
     case 6:
-      if(a3 == 4){
+      if(a3 % 100 == 4){
         if(x3 == x4){
           tx1 = x4;
           ty1 = y4 - kage.kMage;
@@ -245,7 +245,7 @@ function dfDrawFont(kage, polygons, a1, a2, a3, x1, y1, x2, y2, x3, y3, x4, y4){
           ty1 = y4 - kage.kMage * Math.sin(rad) * v;
         }
         cdDrawBezier(kage, polygons, x1, y1, x2, y2, x3, y3, tx1, ty1, a2, 1);
-        cdDrawCurve(kage, polygons, tx1, ty1, x4, y4, x4 - kage.kMage, y4, 1, 14);
+        cdDrawCurve(kage, polygons, tx1, ty1, x4, y4, x4 - kage.kMage, y4, 1, a3 + 10);
       }
       else if(a3 == 5){
         cdDrawBezier(kage, polygons, x1, y1, x2, y2, x3, y3, x4, y4, a2, 15);

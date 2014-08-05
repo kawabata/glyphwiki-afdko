@@ -1,4 +1,5 @@
-# GlyphWiki AFDKO Font Generator
+GlyphWiki AFDKO Font Generator
+==============================
 
 - site :: http://github.com/kawabata/glyphwiki-afdko
 

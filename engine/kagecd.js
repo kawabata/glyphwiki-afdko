@@ -616,8 +616,8 @@ function cdDrawCurveU(kage, polygons, x1, y1, sx1, sy1, sx2, sy2, x2, y2, ta1, t
       poly = new Polygon();
       poly.push(x2, y2);
       poly.push(x2, y2 - kMinWidthT);
-      poly.push(x2 - kage.kWidth * 4 * Math.pow(kMinWidthT / kage.kMinWidthT, 3), y2 - kMinWidthT);
-      poly.push(x2 - kage.kWidth * 4 * Math.pow(kMinWidthT / kage.kMinWidthT, 3), y2 - kMinWidthT * 0.5);
+      poly.push(x2 - kage.kWidth * 4 * Math.min(1 - opt2 / 10, Math.pow(kMinWidthT / kage.kMinWidthT, 3)), y2 - kMinWidthT);
+      poly.push(x2 - kage.kWidth * 4 * Math.min(1 - opt2 / 10, Math.pow(kMinWidthT / kage.kMinWidthT, 3)), y2 - kMinWidthT * 0.5);
       //poly.reverse();
       polygons.push(poly);
     }

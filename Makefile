@@ -1,6 +1,6 @@
 # GlyphWiki Font Generator -*- mode: Makefile -*-
 
-spec_A	= '^u00[2-7][0-9a-f]$$$$:^u[2-9f][0-9a-f]{3}(-u[0-9a-f]{4,5})?(-(j[av]|kp|us|[ghjktuv]))?(-vert)?$$$$:^X0213(-u[0-9a-f]{4,5})?$$$$:^cdp-....$$$$'
+spec_A	= '^u00[2-7][0-9a-f]$$$$:^u[2-9f][0-9a-f]{3}(-u[0-9a-f]{4,5})?(-(j[av]|kp|us|[ghjktuv]))?(-vert)?$$$$:^cdp-....$$$$'
 
 spec_B	= '^u00[2-7][0-9a-f]$$$$:^u30[0-9a-f]{2}(-vert)?$$$$:^u2[0-9a-f]{4}(-u[0-9a-f]{4,5})?(-(j[av]|kp|us|[ghjktuv]))?$$$$'
 
@@ -17,19 +17,19 @@ AX: HanaMinAX.otf
 BX: HanaMinBX.otf
 
 HanaMinA.otf:
-	make -f Makefile_HanaMin sub=A spec=$(spec_A) proof
+	make -f Makefile_HanaMin sub=A spec=$(spec_A) otf
 
 HanaMinB.otf:
-	make -f Makefile_HanaMin sub=B spec=$(spec_B) proof
+	make -f Makefile_HanaMin sub=B spec=$(spec_B) otf
 
 HanaMinAX.otf:
-	make -f Makefile_HanaMin sub=AX spec=$(spec_AX) proof
+	make -f Makefile_HanaMin sub=AX spec=$(spec_AX) otf
 
 HanaMinBX.otf:
-	make -f Makefile_HanaMin sub=BX spec=$(spec_BX) proof
+	make -f Makefile_HanaMin sub=BX spec=$(spec_BX) otf
 
-HanaMinAFDKO.tar.xz: HanaMinA.otf HanaMinB.otf HanaMinA.proof.pdf HanaMinB.proof.pdf
-	tar cvfJ HanaMinAFDKO.tar.xz HanaMinA.otf HanaMinB.otf README.md HanaMinA.proof.pdf HanaMinB.proof.pdf HanaMinA.cmap HanaMinB.cmap
+HanaMinAFDKO.tar.xz: HanaMinA.otf HanaMinB.otf
+	tar cvfJ HanaMinAFDKO.tar.xz HanaMinA.otf HanaMinB.otf README.md
 
 install:
 	cp HanaMinAFDKO.tar.xz $(HOME)/Dropbox/Public/HanaMinAFDKO-$(version).tar.xz

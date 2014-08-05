@@ -30,15 +30,15 @@ function Polygons(){
       }
     }
 
-    var temp = 0;
-    for(var i = 0; i < polygon.array.length - 1; i++){
-        temp = temp + (polygon.array[i].x + polygon.array[i + 1].x) * (polygon.array[i + 1].y - polygon.array[i].y);
-    }
-    temp = temp + (polygon.array[i].x + polygon.array[0].x) * (polygon.array[0].y - polygon.array[i].y);
-    temp = temp / 2;
-    if(temp > 0){
-        polygon.reverse();
-    }
+    //var temp = 0;
+    //for(var i = 0; i < polygon.array.length - 1; i++){
+    //    temp = temp + (polygon.array[i].x + polygon.array[i + 1].x) * (polygon.array[i + 1].y - polygon.array[i].y);
+    //}
+    //temp = temp + (polygon.array[i].x + polygon.array[0].x) * (polygon.array[0].y - polygon.array[i].y);
+    //temp = temp / 2;
+    //if(temp > 0){
+    //    polygon.reverse();
+    //}
 
     if(error == 0 && minx != maxx && miny != maxy && polygon.array.length >= 3){
       var newArray = new Array();
@@ -128,31 +128,10 @@ function Polygons(){
       //return Math.floor(val*95/20+25.5);
       return Math.floor(val*5);
   }
-  function generateSVGFont(curve){ // string
+  function generateSVGFont(curve){
+    // curve=false is assumed.
     var buffer = "";
     buffer += "<font horiz-adv-x=\"1000\">\n";
-    //if(curve){
-    //  for(var i = 0; i < this.array.length; i++){
-    //    var mode = "L";
-    //    buffer += "<path d=\"M ";
-    //    buffer += this.array[i].array[0].x + "," + this.array[i].array[0].y + " ";
-    //    for(var j = 1; j < this.array[i].array.length; j++){
-    //      if(this.array[i].array[j].off == 1){
-    //        buffer += "Q ";
-    //        mode = "Q";
-    //      } else if(mode == "Q" && this.array[i].array[j - 1].off != 1){
-    //        buffer += "L ";
-    //      } else if(mode == "L" && j == 1){
-    //        buffer += "L ";
-    //      }
-    //      buffer += this.array[i].array[j].x + "," + this.array[i].array[j].y + " ";
-    //    }
-    //    buffer += "Z\" fill=\"black\" />\n";
-    //  }
-    //  buffer += "</font>\n";
-    //} else
-    //  {
-      //buffer += "<font-face font-family=\"GlyphWiki\" units-per-em=\"1000\" underline-position=\"-200\" underline-thickness=\"200\"/>\n<glyph unicode=\"a\" d=\"";
       buffer += "<font-face font-family=\"GlyphWiki\" units-per-em=\"1000\" ascent=\"880\" descent=\"120\"/>\n<glyph unicode=\"a\" d=\"";
       for(var i = 0; i < this.array.length; i++){
         buffer += "M"+unitFix(this.array[i].array[0].x)+","+(880-unitFix(this.array[i].array[0].y));
@@ -163,7 +142,6 @@ function Polygons(){
       }
       buffer += "\" />\n";
       buffer += "</font>\n";
-    //}
     return buffer;
   }
   Polygons.prototype.generateSVGFont = generateSVGFont;
