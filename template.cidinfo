@@ -1,7 +1,7 @@
 FontName       (HanaMin$sub)
 FullName       (Hanazono Mincho $sub)
-FamilyName     (Hanazono Mincho)
-Weight         ($sub)
+FamilyName     (Hanazono Mincho $sub)
+Weight         Regular
 version        (1.000)
 Registry       (Adobe)
 Ordering       (Identity)
