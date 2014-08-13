@@ -22,9 +22,10 @@ if(arguments.length != 1){
 }
 target = arguments[0];
 
-file = new java.io.File("./work");
-if(!file.exists()){
-  file.mkdir();
+dirname = "./"+target+".work";
+dir = new java.io.File(dirname);
+if(!dir.exists()){
+  dir.mkdir();
 }
 
 fis = new java.io.FileInputStream("./" + target + ".source");
@@ -40,18 +41,17 @@ while((line = br.readLine()) != null){
     //kage.kUseCurve = true;
     kage.kUseCurve = false;
     var polygons = new Polygons();
-    
+
     kage.kBuhin.push("temp", data + "");
     kage.makeGlyph(polygons, "temp");
-    
-    fos = new java.io.FileOutputStream("./work/" + code + ".svg");
+
+    fos = new java.io.FileOutputStream(dirname + "/" + code + ".svg");
     osw = new java.io.OutputStreamWriter(fos);
     bw = new java.io.BufferedWriter(osw);
-    
-    //bw.write(polygons.generateSVG(true));
-    //bw.write(polygons.generateSVG(false));
-    bw.write(polygons.generateSVGFont(false));
-    
+
+    bw.write(polygons.generateSVG(false));
+    //bw.write(polygons.generateSVGFont(false));
+
     bw.close();
     osw.close();
     fos.close();

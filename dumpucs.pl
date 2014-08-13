@@ -181,23 +181,21 @@ sub get_strokes_data{
     my @result = ();
     foreach(split(/\$/, $buffer)){
         if($_ =~ m/^99:/){
-            # my ($type, $a1, $a2, $x1, $y1, $x2, $y2, $name) = split(/:/, $_);
-            my ($type, $sx, $sy, $x1, $y1, $x2, $y2, $name, $sx2, $sy2) = split(/:/, $_);
+            my ($type, $sx, $sy, $x1, $y1, $x2, $y2, $name, $dummy, $sx2, $sy2) = split(/:/, $_);
             my $sub = &get_strokes_data($name);
             my ($minX,$minY,$maxX,$maxY) = get_box($name);
             if ($sx != 0 || $sy != 0) {
                 if ($sx > 100) {
                     $sx -= 200;
                 } else {
-                    $sx = 0;
-                    $sy = 0;
+                    $sx2 = 0;
+                    $sy2 = 0;
                 }
             }
             foreach(split(/\$/, $sub)){
                 # 0を捨てる
                 if($_ =~ m/^(1|8|9):/){
-                    #my ($stype, $sa1, $sa2, $sx1, $sy1, $sx2, $sy2) = split(/:/, $_);
-                    my ($ntype, $nx, $ny, $nx1, $ny1, $nx2, $ny2) = split(/:/, $_);
+                    my ($ntype, $sa, $sa2, $nx1, $ny1, $nx2, $ny2) = split(/:/, $_);
                     if ($sx != 0 || $sy != 0) {
                         $nx1 = stretch($sx,$sx2,$nx1,$minX,$maxX);
                         $ny1 = stretch($sy,$sy2,$ny1,$minY,$maxY);
@@ -205,14 +203,13 @@ sub get_strokes_data{
                         $ny2 = stretch($sy,$sy2,$ny2,$minY,$maxY);
                     }
                     push(@result,
-                         join(':', ($ntype, $nx, $ny,
+                         join(':', ($ntype, $sa, $sa2,
                                     int($x1 + $nx1  * ($x2 - $x1) / 200),
                                     int($y1 + $ny1  * ($y2 - $y1) / 200),
                                     int($x1 + $nx2  * ($x2 - $x1) / 200),
                                     int($y1 + $ny2  * ($y2 - $y1) / 200))));
                 } elsif($_ =~ m/^(2|12|3):/){
-                    #my ($stype, $sa1, $sa2, $sx1, $sy1, $sx2, $sy2, $sx3, $sy3) = split(/:/, $_);
-                    my ($ntype, $nx, $ny, $nx1, $ny1, $nx2, $ny2, $nx3, $ny3) = split(/:/, $_);
+                    my ($ntype, $sa, $sa2, $nx1, $ny1, $nx2, $ny2, $nx3, $ny3) = split(/:/, $_);
                     if ($sx != 0 || $sy != 0) {
                         $nx1 = stretch($sx,$sx2,$nx1,$minX,$maxX);
                         $ny1 = stretch($sy,$sy2,$ny1,$minY,$maxY);
@@ -222,7 +219,7 @@ sub get_strokes_data{
                         $ny3 = stretch($sy,$sy2,$ny3,$minY,$maxY);
                     }
                     push(@result,
-                         join(':', ($ntype, $nx, $ny,
+                         join(':', ($ntype, $sa, $sa2,
                                     int($x1 + $nx1  * ($x2 - $x1) / 200),
                                     int($y1 + $ny1  * ($y2 - $y1) / 200),
                                     int($x1 + $nx2  * ($x2 - $x1) / 200),
@@ -230,8 +227,7 @@ sub get_strokes_data{
                                     int($x1 + $nx3  * ($x2 - $x1) / 200),
                                     int($y1 + $ny3  * ($y2 - $y1) / 200))));
                 } elsif($_ =~ m/^(4|6|7):/){
-                    #my ($stype, $sa1, $sa2, $sx1, $sy1, $sx2, $sy2, $sx3, $sy3, $sx4, $sy4) = split(/:/, $_);
-                    my ($ntype, $nx, $ny, $nx1, $ny1, $nx2, $ny2, $nx3, $ny3,$nx4,$ny4) = split(/:/, $_);
+                    my ($ntype, $sa, $sa2, $nx1, $ny1, $nx2, $ny2, $nx3, $ny3, $nx4, $ny4) = split(/:/, $_);
                     if ($sx != 0 || $sy != 0) {
                         $nx1 = stretch($sx,$sx2,$nx1,$minX,$maxX);
                         $ny1 = stretch($sy,$sy2,$ny1,$minY,$maxY);
@@ -243,7 +239,7 @@ sub get_strokes_data{
                         $ny4 = stretch($sy,$sy2,$ny4,$minY,$maxY);
                     }
                     push(@result,
-                         join(':', ($ntype, $nx, $ny,
+                         join(':', ($ntype, $sa, $sa2,
                                     int($x1 + $nx1  * ($x2 - $x1) / 200),
                                     int($y1 + $ny1  * ($y2 - $y1) / 200),
                                     int($x1 + $nx2  * ($x2 - $x1) / 200),
@@ -270,12 +266,16 @@ sub stretch {
         $p2 = $sp + 100;
         $p4 = $dp + 100;
     } else {
-        $p1 = sp + 100;
-        $p3 = dp + 100;
+        $p1 = $sp + 100;
+        $p3 = $dp + 100;
         $p2 = $max;
         $p4 = $max;
     }
-    return POSIX::floor((($p - $p1) / ($p2 - $p1)) * ($p4 - $p3) + $p3);
+    if ($p2==$p1) {
+        return stretch ($dp,$sp,$p,0,200);
+    } else {
+        return POSIX::floor((($p - $p1) / ($p2 - $p1)) * ($p4 - $p3) + $p3);
+    }
 }
 
 sub get_box {
@@ -286,7 +286,7 @@ sub get_box {
     my $maxX = 0;
     my $maxY = 0;
     foreach(split(/\$/, $data)){
-        my ($ntype, $nx, $ny, $nx1, $ny1, $nx2, $ny2, $nx3, $ny3, $nx4, $ny4) = split(/:/, $_);
+        my ($ntype, $sa, $sa2, $nx1, $ny1, $nx2, $ny2, $nx3, $ny3, $nx4, $ny4) = split(/:/, $_);
         if($data =~ m/^(1|8|9):/){
             $minX = min ($minX,$nx1,$nx2);
             $maxX = max ($maxX,$nx1,$nx2);
@@ -304,5 +304,5 @@ sub get_box {
             $maxY = max ($maxY,$ny1,$ny2,$ny3,$ny4);
         }
     }
-    return ($minX,$minY);
+    return ($minX,$minY,$maxX,$maxY);
 }

@@ -12,7 +12,8 @@ This is a tool to produce the fonts from [GlyphWiki](http://glyphwiki.org).
 You need [AFDKO](http://www.adobe.com/jp/devnet/opentype/afdko.html),
 Emacs (24.2 or later),
 [Rhino](https://developer.mozilla.org/ja/docs/Rhino), perl, wget, some
-basic Unix tools, 2Gbyte of disk space and internet connection.
+basic Unix tools, 'Math::Clipper' CPAN moduel and 2Gbyte of disk space
+and internet connection.
 
 Then, run the following commands.
 
