@@ -37,7 +37,7 @@ print FH<<"EOT";
 <font-face font-family="GlyphWiki" units-per-em="1000" ascent="880" descent="120"/>
 EOT
 
-print FH "<glyph unicode='a' d=\"";
+print FH "<glyph unicode=\"a\" d=\"";
 
 my $i = 0;
 while(length($result->[$i][0][0]) > 0){
