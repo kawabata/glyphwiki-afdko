@@ -28,9 +28,9 @@ if($count == 0){
     exit;
 }
 
-unlink($filename);
+# unlink($filename);
 
-open FH, ">$filename";
+open FH, ">$filename.font";
 
 print FH<<"EOT";
 <font horiz-adv-x="1000">

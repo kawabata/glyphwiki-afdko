@@ -15,10 +15,10 @@ print FH qq|<font horiz-adv-x="1000">\n<font-face font-family="$TARGET-GlyphWiki
 
 opendir(DIR, $WORK_DIR);
 foreach my $dir (sort { $a cmp $b } readdir(DIR)) {
-  if($dir !~ m/\.svg/){
+  if($dir !~ m/\.svg\.font/){
     next;
   }
-  $dir =~ m/^0u([0-9a-f]{4,6})\.svg$/;
+  $dir =~ m/^0u([0-9a-f]{4,6})\.svg\.font$/;
   if(-e "$WORK_DIR/$dir"){
     my $ucs=$1;
     open FH2, "<:utf8", "$WORK_DIR/$dir";
