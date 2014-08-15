@@ -3,7 +3,9 @@ GlyphWiki AFDKO Font Generator
 
 ## OverView
 
-This is a tool to produce the fonts from [GlyphWiki](http://glyphwiki.org).
+This is a tool to produce the fonts from
+[GlyphWiki](http://glyphwiki.org), the wiki site that anyone can post
+any glyph.
 
 ## Description
 
@@ -33,12 +35,9 @@ You need [AFDKO](http://www.adobe.com/jp/devnet/opentype/afdko.html),
 [Math::Clipper](http://search.cpan.org/~smueller/Math-Clipper/lib/Math/Clipper.pm),
 basic Unix tools, 2Gbyte of disk space and the Internet connection.
 
-If you are using MacOS 10.9.1 or later, installation of Math::Clipper
-via CPAN may fail with default perl. In that case, try using perl5.18.
-
 ## Usage
 
-In default, two fonts will be generated.
+By default, two fonts will be generated.
 
 - HanaMinA.otf (Font Family Name: Hanazono Mincho A)
   This font mainly covers CJKV Ideographs of BMP (Basic Mulitilingual Plane).
@@ -46,14 +45,15 @@ In default, two fonts will be generated.
 - HanaMinB.otf (Font Family Name: Hanazono Mincho B)
   This font mainly covers CJKV Ideographs of SIP (Supplemental Ideographic Plane).
 
-Specify these names in your CSS or other tools as you like.
+These fonts also cover all variants of Adobe-Japan1 and Hanyo-Denshi
+[IVD](http://www.unicode.org/ivd/) collections.
 
 ## Installation
 
 Run the following command to create the newest font. Please make sure
-that you install all the required fonts, set up Perl library
-environment variables and properly set the $(AFDKO) environment
-variable to the installation directory of AFDKO perl scripts.
+that you install all required software, set up Perl library environment
+variables, set the $(AFDKO) environment variable to the installation
+directory of AFDKO perl scripts.
 
     git clone http://github.com/kawabata/glyphwiki-afdko
     cd glyphwiki-afdko
@@ -64,14 +64,15 @@ This will download "dump.tar.gz" from GlyphWiki web site and create
 the fonts. It may take several hours (depends on your machine power),
 and then "HanaMinA.otf" and "HanaMinB.otf" will be produced.
 
-You can check the content of produced fonts by AFDKO spot tools, e.g.
+You can check the contents of produced fonts by AFDKO spot tools, e.g.
 
     spot -Proof HanaMinA.pdf > HanaMinA.ps
     ps2pdf HanaMinA.ps -o HanaMinA.pdf
 
 Note that "spec" is a regular expression to match for GlyphWiki name.
-Also, you can directly download the file from
-[HanaMinAFDKO](https://github.com/cjkvi/HanaMinAFDKO/release) page.
+Pre-built font can be downloaded from
+[HanaMinAFDKO Releases](https://github.com/cjkvi/HanaMinAFDKO/releases)
+page.
 
 ## Troubleshooting
 
@@ -80,13 +81,15 @@ should remove to avoid unexpected error.
 
     find . -type f -empty -delete
 
-For details of this tool, please refer the paper in
+Be sure that Math::Cliper is properly installed. It is confirmed to
+work with Macintosh and Linux.  However, if you are using MacOS 10.9.1
+or later, installation of Math::Clipper via CPAN may fail. In that
+case, install perl 5.18 (from Homebrew, etc.) and try again.
 
 ## License
 
-Kage Engine is taken from Kage
-(http://git.chise.org/git/chise/kage.git), distributed under
-[GPLv2](http://www.gnu.org/licenses/gpl-2.0.html).
+[Kage Engine](http://git.chise.org/git/chise/kage.git) is distributed
+under [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html).
 
 'cmap-tool.pl' is copyrighted by Adobe, and is distribued under Adobe
 Opentype Font Developer's Kit ("Fdk")
@@ -97,4 +100,4 @@ For the license of the generated fonts, please refer
 
 ## References
 
-KAWABATA TAichi and KAMICHI Koichi, GlyphWiki - a Wiki-based glyph design and font production system. [link](http://www.atypi.org/past-conferences/hong-kong-2012/papers-and-presentations/glyphwiki-a-wiki-based-glyph-design-and-font-production-system.-taichi-kawabata-and-kamichi-koichi/view)
+- KAWABATA TAichi and KAMICHI Koichi, _GlyphWiki_ - _a Wiki-based glyph design and font production system_. ( [link](http://www.atypi.org/past-conferences/hong-kong-2012/papers-and-presentations/glyphwiki-a-wiki-based-glyph-design-and-font-production-system.-taichi-kawabata-and-kamichi-koichi/view))
