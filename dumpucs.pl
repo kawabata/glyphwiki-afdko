@@ -56,10 +56,10 @@ foreach(sort(keys(%dump1))){
 }
 
 # cdp を、$fontname.sourceへ出力、@data, $map へ加える。
-if ($cdp) {
-    foreach(sort(keys(%dump1))){
-        my $name = $_;
-        if($name =~ m/^cdp-[0-9a-f]{4}$/){
+foreach(sort(keys(%dump1))){
+    my $name = $_;
+    if($name =~ m/^cdp-[0-9a-f]{4}$/){
+        if (check_regexps($name) == 1) {
             proc_cdp($name,$fh);
         }
     }
