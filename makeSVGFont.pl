@@ -13,8 +13,9 @@ $WORK_DIR = "./$TARGET.work";
 open FH, ">:utf8", "./$TARGET.svg";
 print FH qq|<font horiz-adv-x="1000">\n<font-face font-family="$TARGET-GlyphWiki" units-per-em="1000" ascent="880" descent="120"/>\n<missing-glyph />\n|;
 
+
 opendir(DIR, $WORK_DIR);
-foreach my $dir (sort { $a cmp $b } readdir(DIR)) {
+foreach my $dir (sort { length $a <=> length $b || $a cmp $b } readdir(DIR)) {
   if($dir !~ m/\.svg\.font/){
     next;
   }
