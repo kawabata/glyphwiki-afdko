@@ -1,7 +1,7 @@
 GlyphWiki AFDKO Font Generator
 ==============================
 
-## OverView
+## Overview
 
 This is a tool to produce the fonts from
 [GlyphWiki](http://glyphwiki.org), the wiki site that anyone can post
@@ -57,6 +57,8 @@ directory of AFDKO perl scripts.
 
     git clone http://github.com/kawabata/glyphwiki-afdko
     cd glyphwiki-afdko
+    git submodule init
+    git submodule update
     «check Makefile/Makefile_HanaMin settings»
     make
 
