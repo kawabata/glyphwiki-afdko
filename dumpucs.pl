@@ -167,6 +167,7 @@ sub check_regexps {
 sub get_page{
     my ($wikiname) = @_;
     if($wikiname =~ m/\@/){ # バージョンつき
+        $wikiname =~ s/\@/\\\@/g;
         return $dump2{$wikiname};
     } else { # バージョンなし。最新分を使う
         return $dump1{$wikiname};
@@ -270,6 +271,9 @@ sub stretch {
         $p3 = $dp + 100;
         $p2 = $max;
         $p4 = $max;
+    }
+    if ($p2 == $p1) {
+        return $p; #stop streching
     }
     return POSIX::floor((($p - $p1) / ($p2 - $p1)) * ($p4 - $p3) + $p3);
 }

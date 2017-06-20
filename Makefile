@@ -29,8 +29,8 @@ HanaMinBX.otf:
 	make -f Makefile_HanaMin sub=BX spec=$(spec_BX) otf
 
 install: all
-	zip HanaMinAFDKO-$(version).zip HanaMinA.otf HanaMinB.otf
-	zip HanaMinExtAFDKO-$(version).zip HanaMinAX.otf HanaMinBX.otf
+	zip HanaMinAFDKO-$(version).zip ~/cvs/HanaMinAFDKO/README.md HanaMinA.otf HanaMinB.otf
+	zip HanaMinExtAFDKO-$(version).zip ~/cvs/HanaMinAFDKO/README.md HanaMinAX.otf HanaMinBX.otf
 
 clean:
 	-make -f Makefile_HanaMin sub=A clean

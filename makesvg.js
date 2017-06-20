@@ -6,15 +6,15 @@ if (match) {
 } else {
     dir = ".";
 }
-print ("loading libraries from `"+dir+"/engine' ...");
-load(dir+"/engine/2d.js");
-load(dir+"/engine/buhin.js");
-load(dir+"/engine/curve.js");
-load(dir+"/engine/kage.js");
-load(dir+"/engine/kagecd.js");
-load(dir+"/engine/kagedf.js");
-load(dir+"/engine/polygon.js");
-load(dir+"/engine/polygons.js");
+print ("loading libraries from `"+dir+"/kage-engine' ...");
+load(dir+"/kage-engine/2d.js");
+load(dir+"/kage-engine/buhin.js");
+load(dir+"/kage-engine/curve.js");
+load(dir+"/kage-engine/kage.js");
+load(dir+"/kage-engine/kagecd.js");
+load(dir+"/kage-engine/kagedf.js");
+load(dir+"/kage-engine/polygon.js");
+load(dir+"/kage-engine/polygons.js");
 
 if(arguments.length != 1){
   print("ERROR: input the target name");
