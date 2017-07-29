@@ -10,7 +10,8 @@ version = $(shell date "+%y.%m%d" | cut -c2-6)
 
 .PHONY: all A B AX BX install clean
 
-all: A B AX BX
+all: A B
+# all: A B AX BX
 A: HanaMinA.otf
 B: HanaMinB.otf
 AX: HanaMinAX.otf
