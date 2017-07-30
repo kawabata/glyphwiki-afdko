@@ -7,6 +7,11 @@ This is a tool to produce the fonts from
 [GlyphWiki](http://glyphwiki.org), the wiki site that anyone can post
 any glyph.
 
+## HanaMin Font (AFDKO version)
+The product font of this toolthat covers all Unicode Ideographs are
+prepared in the
+separated [github repository](https://github.com/cjkvi/HanaMinAFDKO/).
+
 ## Description
 
 This tool creates OpenType GSUB/GPOS featured font from
