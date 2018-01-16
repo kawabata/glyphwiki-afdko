@@ -173,7 +173,6 @@ end
     (goto-char (point-min)) (insert "mergeFonts\n")
     (while (re-search-forward "^glyph\\[\\([0-9]+\\)\\] {\\([^,]+\\),.*$" nil t)
       (replace-match (concat (match-string 1) " " (match-string 2))))
-    (insert "\n0 .notdef\n")
     )
   ;; output CMAP file ;; 後で、cmap-tools で整えなおすこと。
   ;; % cmap-tool.pl < XXX.tmp.cmap > XXX.cmap

@@ -38,7 +38,6 @@ $(BASE).svg: $(BASE).source
 
 $(BASE).pfa: $(BASE).svg
 	tx -t1 $(BASE).svg $(BASE).pfa >>$(BASE).log 2>>$(BASE).err
-	checkOutlines -e -k -O -x $(BASE).pfa >/dev/null 2>>$(BASE).err
 
 $(BASE).dump: $(BASE).pfa
 	tx -dump $(BASE).pfa > $(BASE).dump
@@ -60,6 +59,7 @@ $(BASE).cmap : $(BASE).tmp.cmap
 
 $(BASE).raw: $(BASE).cidinfo $(BASE).cidmap $(BASE).pfa
 	mergeFonts -cid $(BASE).cidinfo $(BASE).raw $(BASE).cidmap $(BASE).pfa >>$(BASE).log 2>>$(BASE).err
+	checkOutlines -e -k -O -x $(BASE).pfa >/dev/null 2>>$(BASE).err
 
 $(BASE).hinted.raw: $(BASE).raw
 	$(PERL) $(AFDKO)/hintcidfont.pl $(PROG)/hintparam.txt < $(BASE).raw > $(BASE).hinted.raw
@@ -101,7 +101,7 @@ all: otf
 clean:
 	-rm -rf $(work)
 	find . \( -name "$(BASE).*" -not -name "*.pdf" -not -name "*.otf" -not -name "*.tar.xz" \) -exec rm {} \;
-	rm checkOutlines.log* GlyphWiki-* current.fpr
+	rm -f checkOutlines.log* GlyphWiki-* current.fpr
 
 distclean: clean
 	rm -rf $(BASE).* dump*.txt Glyphwiki-* current.fpr checkOutlines.log* *.tar.gz

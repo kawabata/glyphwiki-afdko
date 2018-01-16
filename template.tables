@@ -14,8 +14,8 @@ table OS/2 {
 } OS/2;
 
 table name {
-      nameid 0 "2007-2017 GlyphWiki. All Rights Reserved.";
-      nameid 0 3 1 0x411 "2007-2017 GlyphWiki. All Rights Reserved.";
+      nameid 0 "2007-2018 GlyphWiki. All Rights Reserved.";
+      nameid 0 3 1 0x411 "2007-2018 GlyphWiki. All Rights Reserved.";
       nameid 7 "Hanazono Mincho is not yet a trademark of GlyphWiki.";
       nameid 7 3 1 0x411 "Hanazono Mincho is not yet a trademark of GlyphWiki.";
       nameid 9 "KAMICHI Koichi; KAWABATA Taichi";
