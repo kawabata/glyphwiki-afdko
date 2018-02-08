@@ -2,7 +2,7 @@
 
 PROG	= .
 PERL    = perl
-AFDKO   = $(HOME)/bin/FDK/Tools/SharedData/FDKScripts/
+SCRIPTS = $(HOME)/.ghq/github.com/adobe-type-tools/afdko/afdko/Tools/SharedData/FDKScripts/
 PS2PDF  = ps2pdf
 version = $(shell date "+%y.%m%d" | cut -c2-6)
 sub	= A
@@ -37,6 +37,7 @@ $(BASE).svg: $(BASE).source
 	$(PERL) $(PROG)/makeSVGFont.pl $(BASE) >$(BASE).log 2>$(BASE).err
 
 $(BASE).pfa: $(BASE).svg
+	ruby -pine makeSVG-half.rb
 	tx -t1 $(BASE).svg $(BASE).pfa >>$(BASE).log 2>>$(BASE).err
 
 $(BASE).dump: $(BASE).pfa
@@ -62,7 +63,7 @@ $(BASE).raw: $(BASE).cidinfo $(BASE).cidmap $(BASE).pfa
 	checkOutlines -e -k -O -x $(BASE).pfa >/dev/null 2>>$(BASE).err
 
 $(BASE).hinted.raw: $(BASE).raw
-	$(PERL) $(AFDKO)/hintcidfont.pl $(PROG)/hintparam.txt < $(BASE).raw > $(BASE).hinted.raw
+	$(PERL) $(SCRIPTS)/hintcidfont.pl $(PROG)/hintparam.txt < $(BASE).raw > $(BASE).hinted.raw
 	autohint -r -q $(BASE).hinted.raw >>$(BASE).log 2>>$(BASE).err
 
 $(BASE).otf: $(BASE).fmndb $(BASE).ivs $(BASE).cmap $(BASE).hinted.raw $(BASE).features
