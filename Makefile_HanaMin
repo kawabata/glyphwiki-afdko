@@ -37,7 +37,7 @@ $(BASE).svg: $(BASE).source
 	$(PERL) $(PROG)/makeSVGFont.pl $(BASE) >$(BASE).log 2>$(BASE).err
 
 $(BASE).pfa: $(BASE).svg
-	ruby -pine makeSVG-half.rb $(BASE).svg
+	ruby makeSVG-half.rb $(BASE).svg $(BASE).map
 	tx -t1 $(BASE).svg $(BASE).pfa >>$(BASE).log 2>>$(BASE).err
 
 $(BASE).dump: $(BASE).pfa
