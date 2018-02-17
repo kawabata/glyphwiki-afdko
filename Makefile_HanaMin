@@ -18,15 +18,27 @@ work	= ./$(BASE).work
 dump.tar.gz:
 	wget http://glyphwiki.org/dump.tar.gz
 
+HalfwidthGlyphs.txt:
+	wget -O HalfwidthGlyphs.txt 'http://glyphwiki.org/get_source.cgi?name=Group:HalfwidthGlyphs'
+
+NonSpacingGlyphs-Halfwidth.txt:
+	wget -O NonSpacingGlyphs-Halfwidth.txt 'http://glyphwiki.org/get_source.cgi?name=Group:NonSpacingGlyphs-Halfwidth'
+
+Blocks.txt:
+	wget http://www.unicode.org/Public/UNIDATA/Blocks.txt
+
 # 漢文 (U+319X) には '-vert' を追記する。
 dump_all_versions.txt dump_newest_only.txt: dump.tar.gz
 	tar xvfz dump.tar.gz dump_all_versions.txt dump_newest_only.txt
 	touch dump_all_versions.txt
 	$(PERL) -i -pe 's/^( u319[-0-9a-z]*)(.*)$$/\1\2\n\1-vert\2/' dump_newest_only.txt
 
+$(BASE).list: Blocks.txt dump_newest_only.txt
+	emacs --script $(PROG)/gw-list.el
+
 # 空白文字を追記し、ufff[ef]を削除する。
-$(BASE).map $(BASE).alias $(BASE).source: dump_all_versions.txt dump_newest_only.txt
-	$(PERL) $(PROG)/dumpucs.pl "$(spec)" $(BASE)
+$(BASE).map $(BASE).alias $(BASE).source: dump_all_versions.txt dump_newest_only.txt $(BASE).list
+	$(PERL) $(PROG)/dumpucs.pl $(BASE)
 	$(PERL) -pi -e '$$_="" if /^0ufff[ef]/' $(BASE).source
 	echo "0u0020	0:0:0:0\n0u3000	0:0:0:0" >> $(BASE).source
 
@@ -36,7 +48,7 @@ $(BASE).svg: $(BASE).source
 	for file in $(work)/*.svg; do $(PERL) unionpoly.pl $$file; done
 	$(PERL) $(PROG)/makeSVGFont.pl $(BASE) >$(BASE).log 2>$(BASE).err
 
-$(BASE).pfa: $(BASE).svg
+$(BASE).pfa: $(BASE).svg HalfwidthGlyphs.txt NonSpacingGlyphs-Halfwidth.txt
 	ruby makeSVG-half.rb $(BASE).svg $(BASE).map
 	tx -t1 $(BASE).svg $(BASE).pfa >>$(BASE).log 2>>$(BASE).err
 

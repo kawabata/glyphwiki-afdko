@@ -29,10 +29,9 @@
 (defvar gw-regexp-cid-table nil)
 
 ;; misc variables
-(defvar gw-feature-order '(ccmp liga locl ss00 ss01 ss02 ss03
-                           ss04 ss05 ss06 ss07 ss08 ss09 ss10
-                           ss11 ss12 ss13 ss14 ss15 salt trad
-                           vert vrt2))
+(defvar gw-feature-order '(ccmp hwid liga locl ss00 ss01 ss02 ss03 ss04
+                           ss05 ss06 ss07 ss08 ss09 ss10 ss11 ss12 ss13
+                           ss14 ss15 salt trad vert vrt2))
 (defvar gw-lang-regexp
   (regexp-opt '("g" "t" "j" "k" "v" "h" "u" "us" "i" "ja" "jv" "js" "kp")))
 (defvar gw-vmtx-advanceY-data ;; VertAdvanceY
@@ -280,6 +279,7 @@ end
   ;; relation から、(feature lang alt) を返す。
   (cond ((null relation) nil)
         ((equal relation "-vert") '("vert"))
+        ((equal relation "-halfwidth") '("hwid"))
         ((string-match "^-var-\\([0-9]+\\)$" relation)
          (list "salt" nil (string-to-number (match-string 1 relation))))
         ((string-match "^-itaiji-\\([0-9]+\\)$" relation)
@@ -305,7 +305,8 @@ end
    "\\(\\(?:-\\(?:u[0-9a-f]+\\|cdp-[0-9a-f]+\\)\\)+\\)?" ;; base 2
    "\\(-\\(j[av]\\|kp\\|us\\|[g-kmtuv]\\)?\\([01][0-9]\\)?\\)?" ;; component modifier
    "\\(-\\(?:var\\|itaiji\\)-[0-9]+\\)?" ;; variation
-   "\\(-vert\\)?$")) ;; vert
+   "\\(-vert\\)?" ;; vert
+   "\\(-halfwidth\\)?$")) ;; half width
 
 (defun gw-analyze-feature (glyphname)
   ;; GlyphWiki 名を解析して、親グリフ名リストと親子関係 (parents relation)を
@@ -316,9 +317,12 @@ end
           (lang-comp (match-string 3 glyphname))
           (variation (match-string 6 glyphname))
           (vert (match-string 7 glyphname))
+          (half-width (match-string 8 glyphname))
           parents relation)
       (cond (vert (setq parents (concat base1 base2 lang-comp variation)
                         relation vert))
+            (half-width (setq parents (concat base1 base2 lang-comp variation)
+                              relation half-width))
             (variation (setq parents (concat base1 base2 lang-comp)
                              relation variation))
             (lang-comp (setq parents (concat base1 base2)

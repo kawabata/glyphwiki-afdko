@@ -6,7 +6,7 @@ require 'tempfile'
 $hash = Hash.new(nil)
 
 def load_hwg_data ()
-  File.open("HalfWidthGlyphs.txt", :encoding => "UTF-8").each do |line|
+  File.open("HalfwidthGlyphs.txt", :encoding => "UTF-8").each do |line|
     line.scan(/\[\[(.+?)\]\]/) {|gwname|
       $hash[gwname[0]]=true}
   end

@@ -16,8 +16,18 @@ all: A B C
 A: HanaMinA.otf
 B: HanaMinB.otf
 C: HanaMinC.otf
+UX: HanaMinUX.otf
 AX: HanaMinAX.otf
 BX: HanaMinBX.otf
+CX: HanaMinBX.otf
+
+dump.tar.gz:
+	wget http://glyphwiki.org/dump.tar.gz
+
+dump_newest_only.txt: dump.tar.gz
+	tar xvfz dump.tar.gz dump_newest_only.txt
+	touch dump_all_versions.txt
+	$(PERL) -i -pe 's/^( u319[-0-9a-z]*)(.*)$$/\1\2\n\1-vert\2/' dump_newest_only.txt
 
 HanaMinA.otf:
 	make -f Makefile_HanaMin sub=A spec=$(spec_A) otf

@@ -4,18 +4,24 @@ use utf8;
 use POSIX;
 use List::Util qw(min max);
 
-# USAGE: dumpucs.pl regexps <output>
-# e.g. dumpucs.pl '^u[2-9][0-9a-f]{3}:^uf[9a][0-9a-f]{3}:^cdp,:kumimoji' HanaMinA
-# e.g. dumpucs.pl '^u2[0-9a-f]{4}' HanaMinB
+# USAGE: dumpucs.pl <fontname>
+# e.g. dumpucs.pl HanaMinA
+# e.g. dumpucs.pl HanaMinB
+# <fontname>.list file is needed.
 
-my @regexps = split(/:/,$ARGV[0]);
-
-my $fontname = $ARGV[1];
+my $fontname = $ARGV[0];
 
 my $dump1 = "dump_newest_only.txt";
 my $dump2 = "dump_all_versions.txt";
 my %dump1;
 my %dump2;
+
+my %list;
+
+open FH, "$fontname.list";
+while (<FH>){
+    $list{$_}=1;
+}
 
 open FH, "<$dump1";
 while(<FH>){
@@ -49,7 +55,7 @@ open my $fh, ">$fontname.source";
 foreach(sort(keys(%dump1))){
     my $name = $_;
     if ($name =~ m/^u[0-9a-f]+$/) {
-        if (check_regexps($name) == 1) {
+        if ($list{$name} == 1) {
             proc_ucs($name,$fh);
         }
     }
@@ -59,7 +65,7 @@ foreach(sort(keys(%dump1))){
 foreach(sort(keys(%dump1))){
     my $name = $_;
     if($name =~ m/^cdp-[0-9a-f]{4}$/){
-        if (check_regexps($name) == 1) {
+        if ($list{$name} == 1) {
             proc_cdp($name,$fh);
         }
     }
@@ -72,6 +78,7 @@ foreach(sort(keys(%dump1))){
     # この条件チェックは今となっては無用かも。
     if (!($name =~ m/^u[0-9a-f]+$/) &&
         !($name =~ m/^cdp-[0-9a-f]+$/) &&
+        ($list{$name} == 1) &&
         ($name =~ m/^(kumimoji-)?(u([0-9a-f]+)|(cdp)-[0-9a-f]+)((?:-(?:u[0-9a-f]+|cdp-[0-9a-f]+))*)(-(?:j[av]|kp|us|[g-kmtuv])?(?:[01][0-9])?)?(-(?:var|itaiji)-[0-9]+)?(-vert)?$/)) {
         #my $name_kumimoji = $1;
         #my $name_ucs_val = hex($3);
@@ -80,29 +87,27 @@ foreach(sort(keys(%dump1))){
         #my $name_regcomp = $6;
         #my $name_variation = $7;
         my $name_vert = $8;
-        if (check_regexps($name)) {
-            # name_base を分解して、各文字が未登録なら登録する。
-            foreach (split(/(?<!p)-/,$name_base)) {
-                my $base_name = $_;
-                if ($_ =~ /^cdp/) {
-                    proc_cdp($base_name,$fh);
-                } elsif ($_ =~ /^u/) {
-                    proc_ucs($base_name,$fh);
-                }
+        # name_base を文字単位に分解して、各文字が未登録なら登録する。 e.g. u4e00-u20dd → u4e00, u20dd
+        foreach (split(/(?<!p)-/,$name_base)) {
+            my $base_name = $_;
+            if ($_ =~ /^cdp/) {
+                proc_cdp($base_name,$fh);
+            } elsif ($_ =~ /^u/) {
+                proc_ucs($base_name,$fh);
             }
-            my $data = get_strokes_data($name);
-            if($data ne ""){
-                # `-vert' は必ず別グリフにする。
-                if((!exists($data{$data})) || $name_vert){
-                    my $scode = sprintf("u%x", $code);
-                    print $fh "0$scode\t$data\n";
-                    $map .= "$scode\t$name\n";
-                    $code++;
-                    $data{$data} = $name;
-                } else {
-                    if ($data{$data} ne $name) {
-                        $alias .= "$name\t$data{$data}\n";
-                    }
+        }
+        my $data = get_strokes_data($name);
+        if($data ne ""){
+            # `-vert' は必ず別グリフにする。
+            if((!exists($data{$data})) || $name_vert){
+                my $scode = sprintf("u%x", $code);
+                print $fh "0$scode\t$data\n";
+                $map .= "$scode\t$name\n";
+                $code++;
+                $data{$data} = $name;
+            } else {
+                if ($data{$data} ne $name) {
+                    $alias .= "$name\t$data{$data}\n";
                 }
             }
         }
@@ -150,17 +155,6 @@ sub proc_cdp {
             $map .= "$scode\t$name\n";
         }
     }
-}
-
-# 第一引数が、第二引数の範囲リスト内にあるかをチェックする。
-# 範囲内にある場合は 1 を、ない場合は 0 を返す。
-sub check_regexps {
-    my ($val) = @_;
-    my $flag = 0;
-    foreach my $regexp (@regexps) {
-        if ($val =~ m/$regexp/) {$flag=1;}
-    }
-    return $flag;
 }
 
 # 部品データを得る。バージョンがついているかどうかを判別する
