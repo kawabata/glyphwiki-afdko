@@ -6,7 +6,6 @@ use List::Util qw(min max);
 
 # USAGE: dumpucs.pl <fontname>
 # e.g. dumpucs.pl HanaMinA
-# e.g. dumpucs.pl HanaMinB
 # <fontname>.list file is needed.
 
 my $fontname = $ARGV[0];
@@ -15,12 +14,13 @@ my $dump1 = "dump_newest_only.txt";
 my $dump2 = "dump_all_versions.txt";
 my %dump1;
 my %dump2;
-
 my %list;
 
-open FH, "$fontname.list";
+open FH, "<$fontname.list";
 while (<FH>){
-    $list{$_}=1;
+    $name=$_;
+    chomp ($name);
+    $list{$name}=1;
 }
 
 open FH, "<$dump1";
@@ -79,7 +79,7 @@ foreach(sort(keys(%dump1))){
     if (!($name =~ m/^u[0-9a-f]+$/) &&
         !($name =~ m/^cdp-[0-9a-f]+$/) &&
         ($list{$name} == 1) &&
-        ($name =~ m/^(kumimoji-)?(u([0-9a-f]+)|(cdp)-[0-9a-f]+)((?:-(?:u[0-9a-f]+|cdp-[0-9a-f]+))*)(-(?:j[av]|kp|us|[g-kmtuv])?(?:[01][0-9])?)?(-(?:var|itaiji)-[0-9]+)?(-vert)?$/)) {
+        ($name =~ m/^(kumimoji-)?(u([0-9a-f]+)|(cdp)-[0-9a-f]+)((?:-(?:u[0-9a-f]+|cdp-[0-9a-f]+))*)(-(?:j[av]|kp|us|[g-kmtuv])?(?:[01][0-9])?)?(-(?:var|itaiji)-[0-9]+)?(-vert)?(-halfwidth)?$/)) {
         #my $name_kumimoji = $1;
         #my $name_ucs_val = hex($3);
         #my $name_cdp = $4;

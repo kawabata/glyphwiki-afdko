@@ -1,9 +1,9 @@
 ;;; gw-list.el ---                                   -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2018  川幡 太一
+;; Copyright (C) 2018  Taichi Kawabata
 
-;; Author: 川幡 太一 <kawabata.taichi@gmail.com>
-;; Keywords: 
+;; Author: Taichi Kawabata <kawabata.taichi@gmail.com>
+;; Keywords: font
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -20,9 +20,11 @@
 
 ;;; Commentary:
 
-;; Generate list for specified glyphs
+;; Generate list for specified font
 
 ;;; Code:
+
+(require 'cl-lib)
 
 (defvar gw-list-blocks "Blocks.txt")
 (defvar gw-list-dump-newest "dump_newest_only.txt")
@@ -182,7 +184,7 @@
              (block-list (gethash block-name gw-list-blocks-table))
              (message-log-max nil)
              )
-        (message gw-name)
+        ;;(message gw-name)
         (if (null block-list)
             (setq block-list (puthash block-name
                                       (list nil nil nil nil nil nil nil nil)
@@ -200,11 +202,11 @@
                 (cl-pushnew gw-name (elt block-list i)))))))
     ;; cdp todo
     (goto-char (point-min))
-    (let ((block-name "Private Use Area")
-          (list-entry (assoc block-name gw-list))
-          (block-list (puthash "Private Use Area"
-                               (list nil nil nil nil nil nil nil nil)
-                               gw-list-blocks-table)))
+    (let* ((block-name "Private Use Area")
+           (list-entry (assoc block-name gw-list))
+           (block-list (puthash "Private Use Area"
+                                (list nil nil nil nil nil nil nil nil)
+                                gw-list-blocks-table)))
       (while (re-search-forward "^ \\(cdp-[0-9a-f]+\\) " nil t)
         (cl-do ((i 0 (1+ i))) ((> i 8))
           (if (or (equal (elt list-entry (1+ i)) "Y")
@@ -215,6 +217,7 @@
 (defun gw-list-output-numbers ()
   "Output each block numbers in GlyphWiki format."
   (interactive)
+  (require 'dash)
   (message ",%s" (mapconcat 'identity gw-list-font ","))
   (let ((total (list 0 0 0 0 0 0 0 0)))
     (dolist (block gw-list-blocks-list)
@@ -237,6 +240,15 @@
                (gw-names (elt val i)))
           (dolist (gw-name (sort (copy-sequence gw-names) 'string<))
             (insert gw-name "\n")))))))
+
+(defun gw-list (argv)
+  (gw-list-load-blocks)
+  (gw-list-load-dump-newest)
+  (gw-list-output-files))
+
+(when noninteractive
+  (message "invoking from script")
+  (gw-list argv))
 
 (provide 'gw-list)
 
