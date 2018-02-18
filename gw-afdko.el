@@ -29,9 +29,9 @@
 (defvar gw-regexp-cid-table nil)
 
 ;; misc variables
-(defvar gw-feature-order '(ccmp hwid liga locl ss00 ss01 ss02 ss03 ss04
-                           ss05 ss06 ss07 ss08 ss09 ss10 ss11 ss12 ss13
-                           ss14 ss15 salt trad vert vrt2))
+(defvar gw-feature-order '(aalt ccmp hwid liga locl ss00 ss01 ss02 ss03
+                           ss04 ss05 ss06 ss07 ss08 ss09 ss10 ss11 ss12
+                           ss13 ss14 ss15 salt vert vrt2))
 (defvar gw-lang-regexp
   (regexp-opt '("g" "t" "j" "k" "v" "h" "u" "us" "i" "ja" "jv" "js" "kp")))
 (defvar gw-vmtx-advanceY-data ;; VertAdvanceY
@@ -286,7 +286,7 @@ end
         ((string-match "^-var-\\([0-9]+\\)$" relation)
          (list "salt" nil (string-to-number (match-string 1 relation))))
         ((string-match "^-itaiji-\\([0-9]+\\)$" relation)
-         (list "trad" nil (string-to-number (match-string 1 relation))))
+         (list "aalt" nil (string-to-number (match-string 1 relation))))
         ((string-match "^-\\([0-9][0-9]\\)$" relation)
          (list (concat "ss" (match-string 1 relation))))
         ((string-match "^-\\(j[av]\\|kp\\|us\\|[g-kmtuv]\\)\\([0-9][0-9]\\)$"
@@ -375,7 +375,7 @@ end
 
 ;; cf. ~/bin/FDK/Technical Documentation/topic_feature_file_syntax.html
 (defun gw-output-feature ()
-  ;; 現在のバッファに gw-feature-table　の内容を出力する。
+  "現在のバッファに gw-feature-table　の内容を出力する."
   (dolist (lang-script gw-lang-script)
     (insert "languagesystem " (cdr lang-script) " " (car lang-script) ";\n"))
   (let ((vert-lang-table (gethash "vert" gw-feature-table)))
@@ -390,10 +390,15 @@ end
   (dolist (feature gw-feature-order)
     (let ((lang-table (gethash (symbol-name feature) gw-feature-table)))
       (when lang-table
-        (insert (format "feature %s {\n" feature))
+        (if (equal feature 'aalt)
+            (insert "feature aalt useExtension {\n")
+          (insert (format "feature %s {\n" feature)))
+        ;; aalt に限って、dflt 言語を出力しない。
         (let ((dflt-table (gethash "dflt" lang-table)))
           (if dflt-table
-              (gw-output-feature-lang "dflt" dflt-table)))
+              (if (equal feature 'aalt)
+                  (gw-output-feature-lang nil dflt-table)
+              (gw-output-feature-lang "dflt" dflt-table))))
         (maphash
          (lambda (lang orig-table)
            (if (not (equal lang "dflt"))
@@ -431,7 +436,7 @@ end
   (let ((len 1) vec)
     (dolist (item list)
       (if (< len (car item)) (setq len (car item))))
-    (setq vec (make-vector len 0))
+    (setq vec (make-vector len 1)) ;; 2018 ここを 0→1にしてみる
     (dolist (item list)
       (aset vec (1- (car item)) (cdr item)))
     vec))

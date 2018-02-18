@@ -51,6 +51,8 @@ if ($count != 0) {
         $i++;
     }
     print FH "\" />\n";
+} else {
+    print FH "<glyph unicode=\"a\" d=\"\" />\n";
 }
 
 print FH <<"EOT";
