@@ -1,36 +1,38 @@
 # GlyphWiki Font Generator -*- mode: Makefile -*-
 
-.PHONY: all A B AX BX install clean
+.PHONY: all A B AX BX install clean otf pdf proof
 
 all: otf pdf proof
 
-otf: HanaMinA.otf HanaMinB.otf HanaMinC.otf HanaMinUX.otf HanaMinAX.otf HanaMinBX.otf HanaMinCX.otf HanaMinI.otf
-pdf: HanaMinA.pdf HanaMinB.pdf HanaMinC.pdf HanaMinUX.pdf HanaMinAX.pdf HanaMinBX.pdf HanaMinCX.pdf HanaMinI.pdf
-proof: HanaMinA.proof.pdf HanaMinB.proof.pdf HanaMinC.proof.pdf HanaMinUX.proof.pdf HanaMinAX.proof.pdf HanaMinBX.proof.pdf HanaMinCX.proof.pdf HanaMinI.proof.pdf
-
-HanaMinA.otf:
+otf:
 	make -f Makefile_HanaMin sub=A otf
-
-HanaMinB.otf:
 	make -f Makefile_HanaMin sub=B otf
-
-HanaMinC.otf:
 	make -f Makefile_HanaMin sub=C otf
-
-HanaMinUX.otf:
 	make -f Makefile_HanaMin sub=UX otf
-
-HanaMinAX.otf:
 	make -f Makefile_HanaMin sub=AX otf
-
-HanaMinBX.otf:
 	make -f Makefile_HanaMin sub=BX otf
-
-HanaMinCX.otf:
 	make -f Makefile_HanaMin sub=CX otf
-
-HanaMinI.otf:
 	make -f Makefile_HanaMin sub=I otf
+
+proof:
+	make -f Makefile_HanaMin sub=A proof
+	make -f Makefile_HanaMin sub=B proof
+	make -f Makefile_HanaMin sub=C proof
+	make -f Makefile_HanaMin sub=UX proof
+	make -f Makefile_HanaMin sub=AX proof
+	make -f Makefile_HanaMin sub=BX proof
+	make -f Makefile_HanaMin sub=CX proof
+	make -f Makefile_HanaMin sub=I proof
+
+pdf:
+	make -f Makefile_HanaMin sub=A pdf
+	make -f Makefile_HanaMin sub=B pdf
+	make -f Makefile_HanaMin sub=C pdf
+	make -f Makefile_HanaMin sub=UX pdf
+	make -f Makefile_HanaMin sub=AX pdf
+	make -f Makefile_HanaMin sub=BX pdf
+	make -f Makefile_HanaMin sub=CX pdf
+	make -f Makefile_HanaMin sub=I pdf
 
 clean:
 	-make -f Makefile_HanaMin sub=A clean

@@ -34,23 +34,43 @@ Following procedures are taken to create fonts from GlyphWiki.
 
 ## Requirements
 
-You need [AFDKO](http://www.adobe.com/jp/devnet/opentype/afdko.html),
-[Emacs](www.gnu.org/software/emacs) (24.2 or later),
+You need [AFDKO](http://www.adobe.com/jp/devnet/opentype/afdko.html)
+[Github Version](https://github.com/adobe-type-tools/afdko),
+[Adobe Perl Scripts](https://github.com/adobe-type-tools/perl-scripts),
+[Emacs](www.gnu.org/software/emacs) (25.2 or later),
 [Rhino](https://developer.mozilla.org/ja/docs/Rhino), perl, wget,
 [Math::Clipper](http://search.cpan.org/~smueller/Math-Clipper/lib/Math/Clipper.pm),
-basic Unix tools, 2Gbyte of disk space and the Internet connection.
+basic Unix tools, 10Gbyte of disk space and the Internet connection.
 
 ## Usage
 
-By default, two fonts will be generated.
+By default, eight fonts will be generated.
 
 - HanaMinA.otf (Font Family Name: Hanazono Mincho A)
   This font mainly covers CJKV Ideographs of BMP (Basic Mulitilingual Plane).
 
 - HanaMinB.otf (Font Family Name: Hanazono Mincho B)
-  This font mainly covers CJKV Ideographs of SIP (Supplemental Ideographic Plane).
+  This font mainly covers CJK Unified Ideographs Extension B.
 
-These fonts also cover all variants of Adobe-Japan1 and Hanyo-Denshi
+- HanaMinC.otf (Font Family Name: Hanazono Mincho C)
+  This font mainly covers CJK Unified Ideographs Extension C to F.
+
+- HanaMinAX.otf (Font Family Name: Hanazono Mincho AX)
+  This font mainly covers CJKV Ideographs of Extension A.
+
+- HanaMinUX.otf (Font Family Name: Hanazono Mincho AX)
+  This font mainly covers CJKV Ideographs URO (Unified Repertoire Ordering).
+
+- HanaMinBX.otf (Font Family Name: Hanazono Mincho BX)
+  This font mainly covers CJK Unified Ideographs Extension B.
+
+- HanaMinCX.otf (Font Family Name: Hanazono Mincho CX)
+  This font mainly covers CJK Unified Ideographs Extension C to F.
+
+- HanaMinI.otf (Font Family Name: Hanazono Mincho I)
+  This font mainly covers IDS (Ideographic Description Sequences).
+
+These fonts also cover all variants of
 [IVD](http://www.unicode.org/ivd/) collections.
 
 ## Installation

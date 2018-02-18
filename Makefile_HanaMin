@@ -2,7 +2,7 @@
 
 PROG	= .
 PERL    = perl
-SCRIPTS = $(HOME)/.ghq/github.com/adobe-type-tools/afdko/afdko/Tools/SharedData/FDKScripts/
+SCRIPTS = $(HOME)/.ghq/github.com/adobe-type-tools/perl-scripts/
 PS2PDF  = ps2pdf
 version = $(shell date "+%y.%m%d" | cut -c2-6)
 sub	= A
@@ -72,11 +72,11 @@ $(BASE).cmap : $(BASE).tmp.cmap
 
 $(BASE).raw: $(BASE).cidinfo $(BASE).cidmap $(BASE).pfa
 	mergeFonts -cid $(BASE).cidinfo $(BASE).raw $(BASE).cidmap $(BASE).pfa >>$(BASE).log 2>>$(BASE).err
-	checkOutlines -e -k -O -x $(BASE).pfa >/dev/null 2>>$(BASE).err
+#	checkOutlines -e -k -O -x $(BASE).pfa >/dev/null 2>>$(BASE).err
 
 $(BASE).hinted.raw: $(BASE).raw
 	$(PERL) $(SCRIPTS)/hintcidfont.pl $(PROG)/hintparam.txt < $(BASE).raw > $(BASE).hinted.raw
-	autohint -r -q $(BASE).hinted.raw >>$(BASE).log 2>>$(BASE).err
+#	autohint -r -q $(BASE).hinted.raw >>$(BASE).log 2>>$(BASE).err
 
 $(BASE).otf: $(BASE).fmndb $(BASE).ivs $(BASE).cmap $(BASE).hinted.raw $(BASE).features
 	makeotf $(subrtnz) -newNameID4 -mf $(BASE).fmndb -cs 1 -ci	\
@@ -109,7 +109,7 @@ all: otf
 clean:
 	-rm -rf $(work)
 	find . \( -name "$(BASE).*" -not -name "*.pdf" -not -name "*.otf" -not -name "*.tar.xz" \) -exec rm {} \;
-	rm -f checkOutlines.log* GlyphWiki-* current.fpr
+	rm -f checkOutlines.log* HalfwidthGlyphs.txt NonSpacingGlyphs-Halfwidth.txt current.fpr
 
 distclean: clean
-	rm -rf $(BASE).* dump*.txt Glyphwiki-* current.fpr checkOutlines.log* *.tar.gz
+	rm -rf $(BASE).* dump*.txt HalfwidthGlyphs.txt NonSpacingGlyphs-Halfwidth.txt current.fpr checkOutlines.log* *.tar.gz

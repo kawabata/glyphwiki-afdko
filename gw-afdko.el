@@ -268,7 +268,10 @@ end
           ((equal feature "ivs") nil)
           ((null analysis) (message "improper glyphname %s" glyphname) nil)
           ((null feature-set) (message "improper relation %s" relation) nil)
-          ((null parents-cid) (message "improper parents-cid %s" parents) nil)
+          ((null parents-cid) (message "improper parents %s" parents) nil)
+           ;;(message "improper parents-cid %s (gn=%s) mapcar=%s"
+           ;;         parents glyphname (mapcar 'gw-glyphname-to-cid parents))
+           ;;nil)
           ((null cid) (message "improper cid %s" glyphname) nil)
           (t
            (puthash glyphname (list parents feature lang alt)

@@ -24,9 +24,9 @@ foreach(@buffer){
 
 $result = simplify_polygons(eval("[".join(",", @poly)."]"), PFT_NONZERO);
 
-if($count == 0){
-    exit;
-}
+# if($count == 0){
+#     exit;
+# }
 
 # unlink($filename);
 
@@ -37,21 +37,21 @@ print FH<<"EOT";
 <font-face font-family="GlyphWiki" units-per-em="1000" ascent="880" descent="120"/>
 EOT
 
-print FH "<glyph unicode=\"a\" d=\"";
-
-my $i = 0;
-while(length($result->[$i][0][0]) > 0){
-    print FH "M ".($result->[$i][0][0] / 2)." ".(- $result->[$i][0][1] / 2 + 880)." ";
-    my $j = 1;
-    while(length($result->[$i][$j][0]) > 0){
-	print FH "L ".($result->[$i][$j][0] / 2)." ".(- $result->[$i][$j][1] / 2 + 880)." ";
-	$j++;
+if ($count != 0) {
+    print FH "<glyph unicode=\"a\" d=\"";
+    my $i = 0;
+    while(length($result->[$i][0][0]) > 0){
+        print FH "M ".($result->[$i][0][0] / 2)." ".(- $result->[$i][0][1] / 2 + 880)." ";
+        my $j = 1;
+        while(length($result->[$i][$j][0]) > 0){
+            print FH "L ".($result->[$i][$j][0] / 2)." ".(- $result->[$i][$j][1] / 2 + 880)." ";
+            $j++;
+        }
+        print FH "Z ";
+        $i++;
     }
-    print FH "Z ";
-    $i++;
+    print FH "\" />\n";
 }
-
-print FH "\" />\n";
 
 print FH <<"EOT";
 </font>

@@ -10,6 +10,10 @@ def load_hwg_data ()
     line.scan(/\[\[(.+?)\]\]/) {|gwname|
       $hash[gwname[0]]=true}
   end
+  File.open("NonSpacingGlyphs-Halfwidth.txt", :encoding => "UTF-8").each do |line|
+    line.scan(/\[\[(.+?)\]\]/) {|gwname|
+      $hash[gwname[0]]=true}
+  end
 end
 
 def load_map_data (mapfile)
