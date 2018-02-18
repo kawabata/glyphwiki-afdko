@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE PosingFont SYSTEM "file://localhost/System/Library/DTDs/SplicedFont.dtd">
+<PosingFont name="$$FONT$$" version="1.0">
+	<Name type="0" string="Copyright 2002-2018 GlyphWiki Project. All Rights Reserved." language="en"/>
+	<Name type="1" string="Hanazono Mincho" language="en"/>
+	<Name type="2" string="Regular" language="en"/>
+	<Name type="3" string="$$VERSION$$;UKWN;HanaMin" language="en"/>
+	<Name type="4" string="Hanazono Mincho" language="en"/>
+	<Name type="8" string="GlyphWiki" language="en"/>
+	<Components>
+$$COMPONENTS$$
+	</Components>
+</PosingFont>
