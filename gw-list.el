@@ -36,12 +36,14 @@
 (defvar gw-list-extended-suffix1 "^-\\(var\\|itaiji\\)-[0-9][0-9][0-9]$")
 (defvar gw-list-extended-suffix2 "^\\(-u[0-9a-f]\\{4,5\\}\\|-cdp-[0-9a-f]\\{4\\}\\)+$")
 
-(defvar gw-list-font '("A" "UX" "AX" "B" "BX" "C" "CX" "I"))
+(defvar gw-list-wiki "gw-list.wiki")
+(defvar gw-list-font '("A" "AX" "UX" "B" "BX" "C" "CX" "I"))
+(defvar gw-list-num (length gw-list-font))
 (defvar gw-list
   '(("Basic Latin" "Y" "X" "X" "Y" "X" "Y" "X" "Y")
     ("Latin-1 Supplement" "Y" "X" nil nil nil nil nil nil)
-    ("Latin Extended-A" nil "X" nil nil nil nil nil nil)
-    ("Latin Extended-B" nil "X" nil nil nil nil nil nil)
+    ("Latin Extended-A" "Y" "X" nil nil nil nil nil nil)
+    ("Latin Extended-B" "Y" "X" nil nil nil nil nil nil)
     ("IPA Extensions" nil "X" nil nil nil nil nil nil)
     ("Spacing Modifier Letters" nil "X" nil nil nil nil nil nil)
     ("Combining Diacritical Marks" nil "X" nil nil nil nil nil nil)
@@ -113,8 +115,8 @@
     ("Variation Selectors" nil "X" nil nil nil nil nil nil)
     ("Vertical Forms" nil "X" nil nil nil nil nil nil)
     ("Combining Half Marks" nil "X" nil nil nil nil nil nil)
-    ("CJK Compatibility Forms" nil "X" nil nil nil nil nil nil)
-    ("Halfwidth and Fullwidth Forms" nil "X" nil nil nil nil nil nil)
+    ("CJK Compatibility Forms" "Y" "X" nil nil nil nil nil nil)
+    ("Halfwidth and Fullwidth Forms" "Y" "X" nil nil nil nil nil nil)
     ("Specials" nil "X" nil nil nil nil nil nil)
     ("Kana Supplement" nil "X" nil nil nil nil nil nil)
     ("Kana Extended-A" nil "X" nil nil nil nil nil nil)
@@ -142,14 +144,31 @@
     ("CJK Unified Ideographs Extension F" nil nil nil nil nil "Y" "X" nil)
     ("CJK Compatibility Ideographs Supplement" nil nil nil nil nil "Y" "X" nil)
     ("Tags" nil nil nil nil nil "Y" "X" nil)
-    ("Variation Selectors Supplement" nil nil nil nil nil "Y" "X" nil)))
+    ("Variation Selectors Supplement" nil nil nil nil nil "Y" "X" nil))
+  )
 
 (defvar gw-list-blocks-list) ;; ブロックの一覧を入れる
 (defvar gw-list-blocks-hash) ;; 各文字が属するブロックを入れる
 (defvar gw-list-blocks-table) ;; gw名を入れる
 
+;; sfont
+(defvar gw-list-sfont-template "template.sfont")
+(defvar gw-list-range '(("HanaMin"  ("HanaMinA" . "[[\\u0000-\\uD7FF][\\uE000-\\uFFFD]]")
+                                    ("HanaMinB" . "[\\u20000-\\u2A6D6]")
+                                    ("HanaMinC" . "[\\u2A700-\\u2FFFD]"))
+                        ("HanaMinX" ("HanaMinAX" . "[[\\u0000-\\u4DFF][\\uA000-\\uD7FF][\\uE000-\\uFFFD]]")
+                                    ("HanaMinUX" . "[\\u4E00-\\u9FFF]")
+                                    ("HanaMinBX" . "[\\u20000-\\u2A6D6]")
+                                    ("HanaMinCX" . "[\\u2A700-\\u2FFFD]"))))
+(defvar gw-list-component-format
+  "		<ComponentDef name=\"%s\">
+			<UnicodeCharSet uset=\"%s\" />
+		</ComponentDef>")
+
+;; code
+
 (defun gw-list-load-blocks ()
-  "Load data files."
+  "Load `Block.txt' data file."
   (interactive)
   ;; blocks
   (with-temp-buffer
@@ -167,7 +186,7 @@
     (setq gw-list-blocks-list (nreverse gw-list-blocks-list))))
 
 (defun gw-list-load-dump-newest ()
-  "Load dump_newest_only.txt file."
+  "Load `dump_newest_only.txt' file."
   (interactive)
   ;; matching
   (setq gw-list-blocks-table (make-hash-table :test 'equal))
@@ -189,7 +208,7 @@
             (setq block-list (puthash block-name
                                       (list nil nil nil nil nil nil nil nil)
                                       gw-list-blocks-table)))
-        (cl-do ((i 0 (1+ i))) ((> i 8))
+        (cl-do ((i 0 (1+ i))) ((>= i gw-list-num))
           (if (and (equal (elt list-entry (1+ i)) "Y")
                    (or (string-match gw-list-normal-suffix1 suffix)
                        (string-match gw-list-normal-suffix2 suffix)))
@@ -200,7 +219,7 @@
                          (string-match gw-list-extended-suffix1 suffix)
                          (string-match gw-list-extended-suffix2 suffix)))
                 (cl-pushnew gw-name (elt block-list i)))))))
-    ;; cdp todo
+    ;; cdp
     (goto-char (point-min))
     (let* ((block-name "Private Use Area")
            (list-entry (assoc block-name gw-list))
@@ -208,32 +227,41 @@
                                 (list nil nil nil nil nil nil nil nil)
                                 gw-list-blocks-table)))
       (while (re-search-forward "^ \\(cdp-[0-9a-f]+\\) " nil t)
-        (cl-do ((i 0 (1+ i))) ((> i 8))
+        (cl-do ((i 0 (1+ i))) ((>= i gw-list-num))
           (if (or (equal (elt list-entry (1+ i)) "Y")
                   (equal (elt list-entry (1+ i)) "X"))
               (cl-pushnew (match-string 1) (elt block-list i))))))
     ))
 
-(defun gw-list-output-numbers ()
-  "Output each block numbers in GlyphWiki format."
+(defun gw-list-output-wiki ()
+  "Output numbers of glyph names to `gw-list.wiki'."
   (interactive)
   (require 'dash)
-  (message ",%s" (mapconcat 'identity gw-list-font ","))
-  (let ((total (list 0 0 0 0 0 0 0 0)))
-    (dolist (block gw-list-blocks-list)
-      (let* ((val (gethash block gw-list-blocks-table))
-             (len (mapcar 'length val)))
-        (when len
-          (setq total (-zip-with '+ total len))
-          (message ",%s,%s"
-                   block
-                   (mapconcat (lambda (x) (format "%d" x)) len ","))
-          gw-list-blocks-table)))
-    (message ",total,%s" (mapconcat (lambda (x) (format "%d" x)) total ","))))
+  (with-temp-file gw-list-wiki
+    (insert (format ",フォント名,%s\n"
+                    (mapconcat (lambda (x) (concat "HanaMin" x))
+                               gw-list-font ",")))
+    (let ((total (list 0 0 0 0 0 0 0 0)))
+      (dolist (block gw-list-blocks-list)
+        (let* ((val (gethash block gw-list-blocks-table))
+               (len (mapcar 'length val)))
+          (when len
+            (setq total (-zip-with '+ total len))
+            (insert
+             (format ",%s,%s\n"
+                     block
+                     (mapconcat (lambda (x) (format "%d" x)) len ",")))
+            gw-list-blocks-table)))
+      (insert (format ",total,%s\n"
+                      (mapconcat (lambda (x) (format "%d" x)) total ","))))
+    (goto-char (point-min))
+    (delete-matching-lines ",0,0,0,0,0,0,0,0")
+    ))
 
 (defun gw-list-output-files ()
+  "Output numbers of glyph names to `gw-list.wiki'."
   (interactive)
-  (cl-do ((i 0 (1+ i))) ((> i 8))
+  (cl-do ((i 0 (1+ i))) ((>= i gw-list-num))
     (with-temp-file (concat "HanaMin" (elt gw-list-font i) ".list")
       (dolist (block gw-list-blocks-list)
         (let* ((val (gethash block gw-list-blocks-table))
@@ -241,9 +269,30 @@
           (dolist (gw-name (sort (copy-sequence gw-names) 'string<))
             (insert gw-name "\n")))))))
 
+;; test (gw-list-output-sfont "8.021")
+(defun gw-list-output-sfont (version)
+  "Output sfont file with VERSION."
+  (dolist (range gw-list-range)
+    (let ((font (car range))
+          (ranges (cdr range)))
+      (with-temp-file (concat font ".sfont")
+        (insert-file-contents gw-list-sfont-template)
+        (goto-char (point-min))
+        (search-forward "$$FONT$$")
+        (replace-match font t)
+        (search-forward "$$VERSION$$")
+        (replace-match version t)
+        (search-forward "$$COMPONENTS$$")
+        (replace-match
+         (mapconcat (lambda (x)
+                      (format gw-list-component-format (car x) (cdr x)))
+                    ranges "\n") t t)))))
+
 (defun gw-list (argv)
+  "Non interactive output to files.  ARGV is version."
   (gw-list-load-blocks)
   (gw-list-load-dump-newest)
+  ;; (gw-list-output-mumbers)
   (gw-list-output-files))
 
 (when noninteractive

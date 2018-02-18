@@ -16,6 +16,8 @@ my %dump1;
 my %dump2;
 my %list;
 
+### Load data
+## load `HanaMinX.list'
 open FH, "<$fontname.list";
 while (<FH>){
     $name=$_;
@@ -23,6 +25,7 @@ while (<FH>){
     $list{$name}=1;
 }
 
+## load `dump_newest_only.txt'
 open FH, "<$dump1";
 while(<FH>){
     $_ =~ m/^ ([^ ]+) *\|[^\|]+\| (.+)\n$/;
@@ -30,8 +33,8 @@ while(<FH>){
 }
 close FH;
 
-# Load "dump_all_versions.txt" entries with "@XXX" (old revision)
-# included.
+## load "dump_all_versions.txt"
+# It contains GlyphWiki names with "@XXX" (revision number.)
 open FH, "<$dump2";
 while(<FH>){
     $_ =~ m/^ ([^\@]+\@[0-9]+) *\|[^\|]+\| (.+)\n$/;
@@ -39,15 +42,14 @@ while(<FH>){
 }
 close FH;
 
-my %names;
-my %data; # {Kage Stroke data -> name} table
-my $alias;
-my $map;
-my $code = 0xf0000;
+my %names; # $names{$name} == 1 if it exists.
+my %data;  # $data{Kage Stroke data} == $glyphwiki_name
+my $alias; # list of aliases
+my $map;   # list of PUA to GlyphWiki Names
+my $code = 0xf0000; # PUA codepoints for non-UCS.
 
 ### Output files
-## output file :: $fontname.{source,alias,map}
-
+## output `HanaMinX.source' file
 my $fh;
 open my $fh, ">$fontname.source";
 
@@ -61,7 +63,7 @@ foreach(sort(keys(%dump1))){
     }
 }
 
-# cdp を、$fontname.sourceへ出力、@data, $map へ加える。
+# cdp-XXXX を、$fontname.sourceへ出力、@data, $map へ加える。
 foreach(sort(keys(%dump1))){
     my $name = $_;
     if($name =~ m/^cdp-[0-9a-f]{4}$/){
