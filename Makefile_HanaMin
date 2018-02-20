@@ -60,15 +60,12 @@ $(BASE).fmndb $(BASE).cidinfo:
 	sed -e s/\$$sub/$(sub)/ -e s/\$$version/$(version)/ \
 	  $(PROG)/template.cidinfo > $(BASE).cidinfo
 
-$(BASE).tmp.cmap $(BASE).ivs $(BASE).cidmap $(BASE).tmp.features $(BASE).html: $(BASE).map $(BASE).alias $(BASE).dump
+$(BASE).cmap $(BASE).ivs $(BASE).cidmap $(BASE).features $(BASE).html: $(BASE).map $(BASE).alias $(BASE).dump
 	emacs --script $(PROG)/gw-afdko.el $(BASE) >>$(BASE).log 2>>$(BASE).err
-
-$(BASE).features : $(BASE).tmp.features
-	cp $(BASE).tmp.features $(BASE).features
+	emacs --script $(PROG)/fix-features.el $(BASE).features
 	sed -e s/\$$version/$(version)/ $(PROG)/template.tables >> $(BASE).features
-
-$(BASE).cmap : $(BASE).tmp.cmap
-	$(PERL) $(PROG)/cmap-tool.pl < $(BASE).tmp.cmap > $(BASE).cmap
+	$(PERL) $(SCRIPTS)/cmap-tool.pl < $(BASE).cmap > $(BASE).tmp.cmap
+	mv $(BASE).tmp.cmap $(BASE).cmap
 
 $(BASE).raw: $(BASE).cidinfo $(BASE).cidmap $(BASE).pfa
 	mergeFonts -cid $(BASE).cidinfo $(BASE).raw $(BASE).cidmap $(BASE).pfa >>$(BASE).log 2>>$(BASE).err

@@ -5,6 +5,8 @@
 ;; Usage ::
 ;; % emacs --script $DIR/gw-afdko.el gw000000
 
+;;;; Code:
+
 ;; basic definitions
 (defvar gw-base      nil) ;; "HanaMinA")
 (defvar gw-file-base nil) ;;  (expand-file-name
@@ -14,11 +16,11 @@
 (defvar gw-alias-file  nil) ;; (concat gw-file-base ".alias"))
 (defvar gw-dump-file   nil) ;; (concat gw-file-base ".dump"))
 ;; output files
-(defvar gw-cmap-file     nil) ;; (concat gw-file-base ".tmp.cmap"))
+(defvar gw-cmap-file     nil) ;; (concat gw-file-base ".cmap"))
 (defvar gw-html-file     nil) ;; (concat gw-file-base ".html"))
 (defvar gw-ivs-file      nil) ;; (concat gw-file-base ".ivs"))
 (defvar gw-cidmap-file   nil) ;; (concat gw-file-base ".cidmap"))
-(defvar gw-features-file nil) ;; (concat gw-file-base ".tmp.features"))
+(defvar gw-features-file nil) ;; (concat gw-file-base ".features"))
 
 ;; tables
 (defvar gw-glyphname-ucs-table nil)
@@ -174,7 +176,8 @@ end
       (replace-match (concat (match-string 1) " " (match-string 2))))
     )
   ;; output CMAP file ;; 後で、cmap-tools で整えなおすこと。
-  ;; % cmap-tool.pl < XXX.tmp.cmap > XXX.cmap
+  ;; % cmap-tool.pl < XXX.cmap > XXX.tmp.cmap
+  ;; % mv XXX.tmp.cmap XXX.cmap
   (with-temp-file gw-cmap-file
     (insert gw-cmap-preamble)
     (maphash
@@ -222,11 +225,11 @@ end
         gw-alias-file    (concat gw-file-base ".alias")
         gw-dump-file     (concat gw-file-base ".dump")
         ;; output file
-        gw-cmap-file     (concat gw-file-base ".tmp.cmap")
+        gw-cmap-file     (concat gw-file-base ".cmap")
         gw-html-file     (concat gw-file-base ".html")
         gw-ivs-file      (concat gw-file-base ".ivs")
         gw-cidmap-file   (concat gw-file-base ".cidmap")
-        gw-features-file (concat gw-file-base ".tmp.features")
+        gw-features-file (concat gw-file-base ".features")
         ;; related tables
         gw-glyphname-ucs-table     (make-hash-table :test 'equal)
         gw-ucs-cid-table           (make-hash-table :test 'equal)
@@ -390,6 +393,7 @@ end
   (dolist (feature gw-feature-order)
     (let ((lang-table (gethash (symbol-name feature) gw-feature-table)))
       (when lang-table
+        ;; aalt に限って、 useExtension を入れる。
         (if (equal feature 'aalt)
             (insert "feature aalt useExtension {\n")
           (insert (format "feature %s {\n" feature)))
