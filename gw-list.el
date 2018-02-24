@@ -27,10 +27,10 @@
 (require 'cl-lib)
 
 (defvar gw-list-fmndb
-  '(("A"    "A"      "A"     )
-    ("B"    "B"      "B"     )
-    ("C"    "C"      "C"     )
-    ("I"    "I"      "I"     )
+  '(("A"    "A"      " A"    )
+    ("B"    "B"      " B"    )
+    ("C"    "C"      " C"    )
+    ("I"    "I"      " I"    )
     ("ExA1" "Ex A1"  "Ｅｘ A1")
     ("ExA2" "Ex A2"  "Ｅｘ A2")
     ("ExB"  "Ex B"   "Ｅｘ B" )
@@ -38,14 +38,14 @@
 
 (defvar gw-list-sfont-range
   '(("HanaMin" "Hanazono Mincho"
-     ("HanaMinA" . "[[\\u0000-\\uD7FF][\\uE000-\\uFFFD]]")
-     ("HanaMinB" . "[\\u20000-\\u2A6D6]")
-     ("HanaMinC" . "[\\u2A700-\\u2FFFD]"))
+     (("HanaMinA" . "[[\\u0000-\\uD7FF][\\uE000-\\uFFFD][\\u10000-u1FFFD]]")
+      ("HanaMinB" . "[\\u20000-\\u2A6D6]")
+      ("HanaMinC" . "[\\u2A700-\\u2FFFD]")))
     ("HanaMinEx" "Hanazono Mincho Ex"
-     ("HanaMinExA1" . "[[\\u0000-\\u4DFF][\\uA000-\\uD7FF][\\uE000-\\uFFFD]]")
-     ("HanaMinExA2" . "[\\u4E00-\\u9FFF]")
-     ("HanaMinExB" . "[\\u20000-\\u2A6D6]")
-     ("HanaMinExC" . "[\\u2A700-\\u2FFFD]"))))
+     (("HanaMinExA1" . "[[\\u0000-\\u4DFF][\\uA000-\\uD7FF][\\uE000-\\uFFFD][\\u10000-u1FFFD]]")
+      ("HanaMinExA2" . "[\\u4E00-\\u9FFF]")
+      ("HanaMinExB" . "[\\u20000-\\u2A6D6]")
+      ("HanaMinExC" . "[\\u2A700-\\u2FFFD]")))))
 
 (defvar gw-list
   '(("Basic Latin" "Y" "Y" "Y" "Y" "X" "X" "X" "X")
@@ -165,8 +165,8 @@
 (defvar gw-list-extended-suffix2 "^\\(-u[0-9a-f]\\{4,5\\}\\|-cdp-[0-9a-f]\\{4\\}\\)+$")
 
 (defvar gw-list-font (mapcar 'car gw-list-fmndb))
+(defvar gw-list-num (length gw-list-fmndb))
 (defvar gw-list-wiki "gw-list.wiki")
-(defvar gw-list-num (length gw-list-font))
 
 (defvar gw-list-blocks-list) ;; ブロックの一覧を入れる
 (defvar gw-list-blocks-hash) ;; 各文字が属するブロックを入れる
@@ -279,6 +279,7 @@
               (cl-pushnew (match-string 1) (elt block-list i))))))
     ))
 
+;; This requires `dash', not working non-interactively.
 (defun gw-list-output-wiki ()
   "Output numbers of glyph names to `gw-list.wiki'."
   (interactive)
@@ -356,8 +357,7 @@
   (gw-list-load-dump-newest)
   (gw-list-output-files)
   (gw-list-output-sfonts (car argv))
-  (gw-list-output-fmndbs)
-  (gw-list-output-wiki))
+  (gw-list-output-fmndbs))
 
 (when noninteractive
   (message "invoking from script")

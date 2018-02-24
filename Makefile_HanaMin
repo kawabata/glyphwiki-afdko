@@ -2,7 +2,7 @@
 
 PROG	= .
 PERL    = perl
-SCRIPTS = $(HOME)/.ghq/github.com/adobe-type-tools/perl-scripts/
+SCRIPTS = $(HOME)/.ghq/github.com/adobe-type-tools/perl-scripts
 PS2PDF  = ps2pdf
 version = $(shell date "+%y.%m%d" | cut -c2-6)
 sub	= A
@@ -39,7 +39,7 @@ dump_all_versions.txt dump_newest_only.txt: dump.tar.gz
 # ---
 
 # 下記は HanaMinXX.sfont も作成。
-$(BASE).list: Blocks.txt dump_newest_only.txt
+$(BASE).list $(BASE).fmndb: Blocks.txt dump_newest_only.txt
 	emacs --script $(PROG)/gw-list.el $(version)
 
 # 空白文字を追記し、ufff[ef]を削除。
@@ -61,9 +61,6 @@ $(BASE).pfa: $(BASE).svg HalfwidthGlyphs.txt NonSpacingGlyphs-Halfwidth.txt
 $(BASE).dump: $(BASE).pfa
 	tx -dump $(BASE).pfa > $(BASE).dump
 
-$(BASE).fmndb:
-	emacs --script $(PROG)/gw-fmndb.el $(sub)
-
 $(BASE).cidinfo:
 	sed -e s/\$$sub/$(sub)/ -e s/\$$version/$(version)/ \
 	  $(PROG)/template.cidinfo > $(BASE).cidinfo
@@ -77,7 +74,7 @@ $(BASE).cmap $(BASE).ivs $(BASE).cidmap $(BASE).features $(BASE).html: $(BASE).m
 
 $(BASE).raw: $(BASE).cidinfo $(BASE).cidmap $(BASE).pfa
 	mergeFonts -cid $(BASE).cidinfo $(BASE).raw $(BASE).cidmap $(BASE).pfa >>$(BASE).log 2>>$(BASE).err
-	checkOutlines -e -k -O -x $(BASE).pfa >/dev/null 2>>$(BASE).err
+#	checkOutlines -e -k -O -x $(BASE).pfa >/dev/null 2>>$(BASE).err
 
 $(BASE).hinted.raw: $(BASE).raw
 	$(PERL) $(SCRIPTS)/hintcidfont.pl $(PROG)/hintparam.txt < $(BASE).raw > $(BASE).hinted.raw
