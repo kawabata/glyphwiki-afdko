@@ -20,25 +20,33 @@
 
 ;;; Commentary:
 
-;; Generate list for specified font
+;; Generate list, sfont and fmndb for HanaMin series.
 
 ;;; Code:
 
 (require 'cl-lib)
 
-(defvar gw-list-blocks "Blocks.txt")
-(defvar gw-list-dump-newest "dump_newest_only.txt")
+(defvar gw-list-fmndb
+  '(("A"    "A"      "A"     )
+    ("B"    "B"      "B"     )
+    ("C"    "C"      "C"     )
+    ("I"    "I"      "I"     )
+    ("ExA1" "Ex A1"  "Ｅｘ A1")
+    ("ExA2" "Ex A2"  "Ｅｘ A2")
+    ("ExB"  "Ex B"   "Ｅｘ B" )
+    ("ExC"  "Ex C"   "Ｅｘ C" )))
 
-(defvar gw-list-normal-suffix1 ;; Variation Selector
-  "^\\(-u\\(\\(e01[0-9a-f][0-9a-f]\\)\\|\\(20d[de]\\)\\|\\(309[9a]\\)\\|\\(fe0[0-f]\\)\\)\\)?$")
-(defvar gw-list-normal-suffix2 ;; language
-  "^\\(-[ghmktuv]\\|j[av]?\\|kp\\|us\\)?\\(-vert\\|-halfwidth\\)?$")
-(defvar gw-list-extended-suffix1 "^-\\(var\\|itaiji\\)-[0-9][0-9][0-9]$")
-(defvar gw-list-extended-suffix2 "^\\(-u[0-9a-f]\\{4,5\\}\\|-cdp-[0-9a-f]\\{4\\}\\)+$")
+(defvar gw-list-sfont-range
+  '(("HanaMin" "Hanazono Mincho"
+     ("HanaMinA" . "[[\\u0000-\\uD7FF][\\uE000-\\uFFFD]]")
+     ("HanaMinB" . "[\\u20000-\\u2A6D6]")
+     ("HanaMinC" . "[\\u2A700-\\u2FFFD]"))
+    ("HanaMinEx" "Hanazono Mincho Ex"
+     ("HanaMinExA1" . "[[\\u0000-\\u4DFF][\\uA000-\\uD7FF][\\uE000-\\uFFFD]]")
+     ("HanaMinExA2" . "[\\u4E00-\\u9FFF]")
+     ("HanaMinExB" . "[\\u20000-\\u2A6D6]")
+     ("HanaMinExC" . "[\\u2A700-\\u2FFFD]"))))
 
-(defvar gw-list-font '("A" "B" "C" "I" "ExA1" "ExA2" "ExB" "ExC"))
-(defvar gw-list-wiki "gw-list.wiki")
-(defvar gw-list-num (length gw-list-font))
 (defvar gw-list
   '(("Basic Latin" "Y" "Y" "Y" "Y" "X" "X" "X" "X")
     ("Latin-1 Supplement" "Y" nil nil nil "X" "X" nil nil)
@@ -146,23 +154,59 @@
     ("Tags" nil nil "Y" nil nil nil nil "X")
     ("Variation Selectors Supplement" nil nil "Y" nil nil nil nil "X")))
 
+(defvar gw-list-blocks "Blocks.txt")
+(defvar gw-list-dump-newest "dump_newest_only.txt")
+
+(defvar gw-list-normal-suffix1 ;; Variation Selector
+  "^\\(-u\\(\\(e01[0-9a-f][0-9a-f]\\)\\|\\(20d[de]\\)\\|\\(309[9a]\\)\\|\\(fe0[0-f]\\)\\)\\)?$")
+(defvar gw-list-normal-suffix2 ;; language
+  "^\\(-[ghmktuv]\\|j[av]?\\|kp\\|us\\)?\\(-vert\\|-halfwidth\\)?$")
+(defvar gw-list-extended-suffix1 "^-\\(var\\|itaiji\\)-[0-9][0-9][0-9]$")
+(defvar gw-list-extended-suffix2 "^\\(-u[0-9a-f]\\{4,5\\}\\|-cdp-[0-9a-f]\\{4\\}\\)+$")
+
+(defvar gw-list-font (mapcar 'car gw-list-fmndb))
+(defvar gw-list-wiki "gw-list.wiki")
+(defvar gw-list-num (length gw-list-font))
+
 (defvar gw-list-blocks-list) ;; ブロックの一覧を入れる
 (defvar gw-list-blocks-hash) ;; 各文字が属するブロックを入れる
 (defvar gw-list-blocks-table) ;; gw名を入れる
 
+;; fmndb
+
+(defvar gw-list-fmndb-file "HanaMin%s.fmndb")
+
+(defvar gw-list-fmndb-format
+  "[HanaMin%s]
+	f=3,1,0x411,\\82b1\\5712\\660e\\671d%s
+	s=3,1,0x411,Regular
+	l=3,1,0x411,\\82b1\\5712\\660e\\671d%s Regular
+        f=1,1,11,\\89\\d4\\89\\80\\96\\be\\92\\a9%s
+        s=1,1,11,Regular
+        l=1,1,11,\\89\\d4\\89\\80\\96\\be\\92\\a9%s Regular
+	f=Hanazono Mincho %s
+	s=Regular
+	l=Hanazono Mincho %s Regular
+")
+
 ;; sfont
-(defvar gw-list-sfont-template "template.sfont")
-(defvar gw-list-range
-  '(("HanaMin"
-     ("HanaMinA" . "[[\\u0000-\\uD7FF][\\uE000-\\uFFFD]]")
-     ("HanaMinB" . "[\\u20000-\\u2A6D6]")
-     ("HanaMinC" . "[\\u2A700-\\u2FFFD]"))
-    ("HanaMinEx"
-     ("HanaMinExA1" . "[[\\u0000-\\u4DFF][\\uA000-\\uD7FF][\\uE000-\\uFFFD]]")
-     ("HanaMinExA2" . "[\\u4E00-\\u9FFF]")
-     ("HanaMinExB" . "[\\u20000-\\u2A6D6]")
-     ("HanaMinExC" . "[\\u2A700-\\u2FFFD]"))))
-(defvar gw-list-component-format
+(defvar gw-list-sfont-format
+  "<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE PosingFont SYSTEM 'file://localhost/System/Library/DTDs/SplicedFont.dtd'>
+<PosingFont name='%s' version='1.0'>
+	<Name type='0' string='Copyright 2002-2018 GlyphWiki Project. All Rights Reserved.' language='en'/>
+	<Name type='1' string='%s' language='en'/>
+	<Name type='2' string='Regular' language='en'/>
+	<Name type='3' string='%s;UKWN;%s' language='en'/>
+	<Name type='4' string='%s' language='en'/>
+	<Name type='8' string='GlyphWiki' language='en'/>
+	<Components>
+%s
+	</Components>
+</PosingFont>
+")
+
+(defvar gw-list-sfont-component-format
   "		<ComponentDef name=\"%s\">
 			<UnicodeCharSet uset=\"%s\" />
 		</ComponentDef>")
@@ -257,11 +301,10 @@
       (insert (format ",total,%s\n"
                       (mapconcat (lambda (x) (format "%d" x)) total ","))))
     (goto-char (point-min))
-    (delete-matching-lines ",0,0,0,0,0,0,0,0")
-    ))
+    (delete-matching-lines ",0,0,0,0,0,0,0,0")))
 
 (defun gw-list-output-files ()
-  "Output numbers of glyph names to `gw-list.wiki'."
+  "Output HanaMinXX.list files."
   (interactive)
   (cl-do ((i 0 (1+ i))) ((>= i gw-list-num))
     (with-temp-file (concat "HanaMin" (elt gw-list-font i) ".list")
@@ -271,40 +314,54 @@
           (dolist (gw-name (sort (copy-sequence gw-names) 'string<))
             (insert gw-name "\n")))))))
 
-;; test (gw-list-output-sfont "8.021")
-(defun gw-list-output-sfont (version)
-  "Output sfont file with VERSION."
-  (dolist (range gw-list-range)
-    (let ((font (car range))
-          (ranges (cdr range)))
-      (with-temp-file (concat font ".sfont")
-        (insert-file-contents gw-list-sfont-template)
-        (goto-char (point-min))
-        (search-forward "$$FONT$$")
-        (replace-match font t)
-        (search-forward "$$VERSION$$")
-        (replace-match version t)
-        (search-forward "$$COMPONENTS$$")
-        (replace-match
-         (mapconcat (lambda (x)
-                      (format gw-list-component-format (car x) (cdr x)))
-                    ranges "\n") t t)))))
+(defun gw-list-output-sfonts (version)
+  "Output HanaMinXX.sfont files with VERSION."
+  (dolist (range gw-list-sfont-range)
+    (let ((font-name (elt range 0))
+          (font-eng  (elt range 1))
+          (ranges    (elt range 2)))
+      (with-temp-file (concat font-name ".sfont")
+        (insert
+         (format gw-list-sfont-format
+                 font-name
+                 font-eng
+                 version
+                 font-name
+                 font-eng
+                 (mapconcat (lambda (x)
+                              (format gw-list-sfont-component-format (car x) (cdr x)))
+                            ranges "\n") t t))))))
+
+(defun gw-list-output-fmndbs ()
+  "Output HanaMinXX.fmndb files."
+  (dolist (entry gw-list-fmndb)
+    (let* ((ps    (elt entry 0))
+           (eng   (elt entry 1))
+           (jpn   (elt entry 2))
+           (sjis  (mapconcat (lambda (x) (format "\\%02x" x))
+                             (string-to-list (encode-coding-string jpn 'shift_jis)) ""))
+           (ucs   (mapconcat (lambda (x) (format "\\%04x" x))
+                             (string-to-list jpn) "")))
+      (with-temp-file (format gw-list-fmndb-file ps)
+        (insert
+         (format gw-list-fmndb-format
+                 ps
+                 ucs ucs
+                 sjis sjis
+                 eng eng))))))
 
 (defun gw-list (argv)
   "Non interactive output to files.  ARGV is version."
   (gw-list-load-blocks)
   (gw-list-load-dump-newest)
   (gw-list-output-files)
-  (gw-list-output-sfont (car argv)))
+  (gw-list-output-sfonts (car argv))
+  (gw-list-output-fmndbs)
+  (gw-list-output-wiki))
 
 (when noninteractive
   (message "invoking from script")
   (gw-list argv))
-
-(unless noninteractive
-  (gw-list-load-blocks)
-  (gw-list-load-dump-newest)
-  (gw-list-output-wiki))
 
 (provide 'gw-list)
 
