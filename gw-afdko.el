@@ -6,6 +6,7 @@
 ;; % emacs --script $DIR/gw-afdko.el gw000000
 
 ;;;; Code:
+(require 'cl-lib)
 
 ;; basic definitions
 (defvar gw-base      nil) ;; "HanaMinA")
@@ -135,11 +136,11 @@ end
 ")
 
 ;; utility function
-(defun addhash (key value table &optional append)
-  "Add VALUE with list associated with KEY in table TABLE."
-  (let ((x (gethash key table)))
-    (add-to-list 'x value append)
-    (puthash key x table)))
+;;(defun addhash (key value table &optional append)
+;;  "Add VALUE with list associated with KEY in table TABLE."
+;;  (let ((x (gethash key table)))
+;;    (add-to-list 'x value append)
+;;    (puthash key x table)))
 
 ;; main
 (defun gw-setup ()
@@ -370,7 +371,7 @@ end
                          (let ((new-orig-table (make-hash-table :test 'equal)))
                            (puthash lang new-orig-table lang-table)
                            new-orig-table))))
-    (if alt (addhash original (cons alt target) orig-table)
+    (if alt (cl-pushnew (cons alt target) (gethash original orig-table))
       (if (gethash original orig-table)
           (message "Warning! Duplicate feature! %s" (list feature lang original alt target)))
       (unless (equal original target)
@@ -458,8 +459,8 @@ end
                           (lambda (x) (list (elt x 0) (elt x 1)))
                           gw-vkrn-data)))
     (if (string-match regexp glyphname)
-        (addhash regexp (gw-glyphname-to-cid glyphname)
-                 gw-regexp-cid-table))))
+        (cl-pushnew (gw-glyphname-to-cid glyphname)
+                    (gethash regexp gw-regexp-cid-table)))))
 
 (defun gw-output-vertical ()
   ;; table vmtx
