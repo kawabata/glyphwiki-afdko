@@ -31,10 +31,10 @@
     ("B"    "B"      " B"    )
     ("C"    "C"      " C"    )
     ("I"    "I"      " I"    )
-    ("ExA1" "Ex A1"  "Ｅｘ A1")
-    ("ExA2" "Ex A2"  "Ｅｘ A2")
-    ("ExB"  "Ex B"   "Ｅｘ B" )
-    ("ExC"  "Ex C"   "Ｅｘ C" )))
+    ("ExA1" "Ex A1"  "Ex A1")
+    ("ExA2" "Ex A2"  "Ex A2")
+    ("ExB"  "Ex B"   "Ex B" )
+    ("ExC"  "Ex C"   "Ex C" )))
 
 (defvar gw-list-sfont-range
   '(("HanaMin" "Hanazono Mincho"
@@ -160,7 +160,7 @@
 (defvar gw-list-normal-suffix1 ;; Variation Selector
   "^\\(-u\\(\\(e01[0-9a-f][0-9a-f]\\)\\|\\(20d[de]\\)\\|\\(309[9a]\\)\\|\\(fe0[0-f]\\)\\)\\)?$")
 (defvar gw-list-normal-suffix2 ;; language
-  "^\\(-[ghmktuv]\\|j[av]?\\|kp\\|us\\)?\\(-vert\\|-halfwidth\\)?$")
+  "^\\(-[gtjkvh]\\|jv?\\|us\\)?\\(-vert\\|-halfwidth\\)?$")
 (defvar gw-list-extended-suffix1 "^-\\(var\\|itaiji\\)-[0-9][0-9][0-9]$")
 (defvar gw-list-extended-suffix2 "^\\(-u[0-9a-f]\\{4,5\\}\\|-cdp-[0-9a-f]\\{4\\}\\)+$")
 

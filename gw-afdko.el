@@ -1,8 +1,29 @@
-;;; gw-afdko.el  -*- coding: utf-8 -*-
+;;; gw-afdko.el  -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2018  Taichi Kawabata
+
+;; Author: Taichi Kawabata <kawabata.taichi@gmail.com>
+;; Keywords: font
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
 
 ;; GlyphWiki to AFDKO generator
 
 ;; Usage ::
+
 ;; % emacs --script $DIR/gw-afdko.el gw000000
 
 ;;;; Code:
@@ -34,7 +55,7 @@
 ;; misc variables
 (defvar gw-feature-order '(aalt ccmp hwid liga locl ss00 ss01 ss02 ss03
                            ss04 ss05 ss06 ss07 ss08 ss09 ss10 ss11 ss12
-                           ss13 ss14 ss15 salt vert vrt2))
+                           ss13 ss14 ss15 salt trad vert vrt2))
 (defvar gw-lang-regexp
   (regexp-opt '("g" "t" "j" "k" "v" "h" "u" "us" "i" "ja" "jv" "js" "kp")))
 (defvar gw-vmtx-advanceY-data ;; VertAdvanceY
@@ -135,13 +156,6 @@ end
 </body>
 ")
 
-;; utility function
-;;(defun addhash (key value table &optional append)
-;;  "Add VALUE with list associated with KEY in table TABLE."
-;;  (let ((x (gethash key table)))
-;;    (add-to-list 'x value append)
-;;    (puthash key x table)))
-
 ;; main
 (defun gw-setup ()
   (interactive)
@@ -174,11 +188,10 @@ end
     (delete-non-matching-lines "^glyph\\[\\([0-9]+\\)\\] {\\([^,]+\\),")
     (goto-char (point-min)) (insert "mergeFonts\n")
     (while (re-search-forward "^glyph\\[\\([0-9]+\\)\\] {\\([^,]+\\),.*$" nil t)
-      (replace-match (concat (match-string 1) " " (match-string 2))))
-    )
-  ;; output CMAP file ;; 後で、cmap-tools で整えなおすこと。
-  ;; % cmap-tool.pl < XXX.cmap > XXX.tmp.cmap
-  ;; % mv XXX.tmp.cmap XXX.cmap
+      (replace-match (concat (match-string 1) " " (match-string 2)))))
+  ;; output CMAP file ;; 後で、cmap-tools で整えなおす。
+  ;;   % cmap-tool.pl < XXX.cmap > XXX.tmp.cmap
+  ;;   % mv XXX.tmp.cmap XXX.cmap
   (with-temp-file gw-cmap-file
     (insert gw-cmap-preamble)
     (maphash
@@ -290,7 +303,7 @@ end
         ((string-match "^-var-\\([0-9]+\\)$" relation)
          (list "salt" nil (string-to-number (match-string 1 relation))))
         ((string-match "^-itaiji-\\([0-9]+\\)$" relation)
-         (list "aalt" nil (string-to-number (match-string 1 relation))))
+         (list "trad" nil (string-to-number (match-string 1 relation))))
         ((string-match "^-\\([0-9][0-9]\\)$" relation)
          (list (concat "ss" (match-string 1 relation))))
         ((string-match "^-\\(j[av]\\|kp\\|us\\|[g-kmtuv]\\)\\([0-9][0-9]\\)$"
@@ -572,5 +585,9 @@ end
           gw-base        (file-name-nondirectory gw-file-base))
     (gw-setup)))
 
-;; when invoked from command line
+;; noninteractive
 (when argv (gw-afdko-main argv))
+
+(provide 'gw-afdko)
+
+;;; gw-afdko.el ends here
