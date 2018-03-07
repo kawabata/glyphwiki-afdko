@@ -4,7 +4,7 @@ PROG	= .
 PERL    = perl
 SCRIPTS = $(HOME)/.ghq/github.com/adobe-type-tools/perl-scripts
 PS2PDF  = ps2pdf
-version = $(shell date "+%y.%m%d" | cut -c2-6)
+version = $(shell date "+%y.%j")
 sub	= A
 # If you set "-S" to the following variable, makeotf will subroutinze, but it will take a long time.
 subrtnz =

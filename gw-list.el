@@ -34,7 +34,8 @@
     ("ExA1" "Ex A1"  "Ex A1")
     ("ExA2" "Ex A2"  "Ex A2")
     ("ExB"  "Ex B"   "Ex B" )
-    ("ExC"  "Ex C"   "Ex C" )))
+    ("ExC"  "Ex C"   "Ex C" ))
+  "PS Name, Eng Name, JPN Name.")
 
 (defvar gw-list-sfont-range
   '(("HanaMin" "Hanazono Mincho"
@@ -42,8 +43,8 @@
       ("HanaMinB" . "[\\u20000-\\u2A6D6]")
       ("HanaMinC" . "[\\u2A700-\\u2FFFD]")))
     ("HanaMinEx" "Hanazono Mincho Ex"
-     (("HanaMinExA1" . "[[\\u0000-\\u4DFF][\\uA000-\\uD7FF][\\uE000-\\uFFFD][\\u10000-u1FFFD]]")
-      ("HanaMinExA2" . "[\\u4E00-\\u9FFF]")
+     (("HanaMinExA1" . "[[\\u0000-\\u007F][\\u4E00-\\u9FFF]]")
+      ("HanaMinExA2" . "[[\\u0080-\\u4DFF][\\uA000-\\uD7FF][\\uE000-\\uFFFD][\\u10000-u1FFFD]]")
       ("HanaMinExB" . "[\\u20000-\\u2A6D6]")
       ("HanaMinExC" . "[\\u2A700-\\u2FFFD]")))))
 

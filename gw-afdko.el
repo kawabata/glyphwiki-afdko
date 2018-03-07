@@ -57,18 +57,20 @@
                            ss04 ss05 ss06 ss07 ss08 ss09 ss10 ss11 ss12
                            ss13 ss14 ss15 salt trad vert vrt2))
 (defvar gw-lang-regexp
-  (regexp-opt '("g" "t" "j" "k" "v" "h" "u" "us" "i" "ja" "jv" "js" "kp")))
+  (regexp-opt '("g" "t" "h" "j" "jv" "k" "v" "u"))) ;; "ja" "js" "kp" "us" "i"
 (defvar gw-vmtx-advanceY-data ;; VertAdvanceY
   '(("^u319.+-vert$" . 500)))
 (defvar gw-vkrn-data ;; vkrn
   '(("^u3190-vert" "^u319[1-9a-f]\\(-u3191\\)?-vert" -500)
     ("^u319[0-9a-f]\\(-u3191\\)?-vert" "^\\(u300[12]\\)-vert" -500)))
 
-;; "js" "m" "kp" "i" は後でサポート
 (defvar gw-lang
-  '(("j" . "JAN")  ("ja" . "JAN") ("js" . "JAN") ("jv" . "JAN")
-    ("g" . "ZHS")  ("t"  . "ZHT") ("h"  . "ZHH") ("k"  . "KOR")
-    ("kp" . "KOR") ("v" . "VIE")  ("u"  . "ENG")))
+  '(("g" . "ZHS")  ("t"  . "ZHT") ("h"  . "ZHH")
+    ("j" . "JAN")  ("jv" . "JAN")
+    ("k" . "KOR")
+    ("v" . "VIE")  ("u"  . "ENG")
+    ;; ("ja" . "JAN") ("js" . "JAN") ("kp" . "KOR")
+    ))
 (defvar gw-lang-script
   '(("dflt" . "DFLT")
     ("JAN" . "hani") ("ZHS" . "hani") ("ZHT" . "hani") ("ZHH" . "hani")
@@ -296,7 +298,7 @@ end
            (gw-register-feature feature lang parents-cid alt cid)))))
 
 (defun gw-relation-to-feature-set (relation)
-  ;; relation から、(feature lang alt) を返す。
+  "Return (feature lang alt) from RELATION."
   (cond ((null relation) nil)
         ((equal relation "-vert") '("vert"))
         ((equal relation "-halfwidth") '("hwid"))
@@ -314,46 +316,50 @@ end
          (list "locl" (cdr (assoc (match-string 1 relation) gw-lang))))
         ((or (equal "ivs" relation)
              (equal "ccmp" relation)
+             (equal "dlig" relation)
              (equal "liga" relation))
          (list relation))
         (t (error "imporper relation! %s" relation))))
 
 (defvar gw-glyphname-regexp
   (concat
-   "^\\(?:kumimoji-\\)?"
+   "^\\(kumimoji-\\)?"
    "\\(u[0-9a-f]+\\|cdp-[0-9a-f]+\\)" ;; base 1
    "\\(\\(?:-\\(?:u[0-9a-f]+\\|cdp-[0-9a-f]+\\)\\)+\\)?" ;; base 2
-   "\\(-\\(j[av]\\|kp\\|us\\|[g-kmtuv]\\)?\\([01][0-9]\\)?\\)?" ;; component modifier
+   "\\(-\\(jv?\\|[gthktvu]\\)?\\([01][0-9]\\)?\\)?" ;; component modifier
    "\\(-\\(?:var\\|itaiji\\)-[0-9]+\\)?" ;; variation
    "\\(-vert\\)?" ;; vert
    "\\(-halfwidth\\)?$")) ;; half width
 
 (defun gw-analyze-feature (glyphname)
-  ;; GlyphWiki 名を解析して、親グリフ名リストと親子関係 (parents relation)を
-  ;; glyphwiki名で返す。不正な場合はnilを返す。
+  "Analyze Glyphwiki name and convert to OpenType feature.
+OpenType feature is returned as (parents relation).
+If it is illegal name, return nil."
   (if (string-match gw-glyphname-regexp glyphname)
-    (let ((base1 (match-string 1 glyphname))
-          (base2 (match-string 2 glyphname))
-          (lang-comp (match-string 3 glyphname))
-          (variation (match-string 6 glyphname))
-          (vert (match-string 7 glyphname))
-          (half-width (match-string 8 glyphname))
-          parents relation)
-      (cond (vert (setq parents (concat base1 base2 lang-comp variation)
-                        relation vert))
-            (half-width (setq parents (concat base1 base2 lang-comp variation)
-                              relation half-width))
-            (variation (setq parents (concat base1 base2 lang-comp)
-                             relation variation))
-            (lang-comp (setq parents (concat base1 base2)
-                             relation lang-comp))
-            (base2     (setq parents (gw-split-base-glyphs (concat base1 base2))
-                             relation
-                             (cond ((string-match "^-ue01" base2) "ivs")
-                                   ((string-match "^-ufe0" base2) "ivs")
-                                   ((string-match "^u2ff" base1) "ccmp")
-                                   (t "liga")))))
-      (cons parents relation))
+      (let ((kumimoji (match-string 1 glyphname))
+            (base1 (match-string 2 glyphname))
+            (base2 (match-string 3 glyphname))
+            (lang-comp (match-string 4 glyphname))
+            (variation (match-string 7 glyphname))
+            (vert (match-string 8 glyphname))
+            (half-width (match-string 9 glyphname))
+            parents relation)
+        (cond (vert (setq parents (concat base1 base2 lang-comp variation)
+                          relation vert))
+              (half-width (setq parents (concat base1 base2 lang-comp variation)
+                                relation half-width))
+              (variation (setq parents (concat base1 base2 lang-comp)
+                               relation variation))
+              (lang-comp (setq parents (concat base1 base2)
+                               relation lang-comp))
+              (base2     (setq parents (gw-split-base-glyphs (concat base1 base2))
+                               relation
+                               (cond ((string-match "^-ue01" base2) "ivs")
+                                     ((string-match "^-ufe0" base2) "ivs")
+                                     ((string-match "^u2ff" base1) "ccmp")
+                                     (kumimoji "dlig")
+                                     (t "liga")))))
+        (cons parents relation))
     (message "Not proper GlyphWiki name! %s" glyphname)
     nil))
 
@@ -392,7 +398,7 @@ end
 
 ;; cf. ~/bin/FDK/Technical Documentation/topic_feature_file_syntax.html
 (defun gw-output-feature ()
-  "現在のバッファに gw-feature-table　の内容を出力する."
+  "Output `gw-feature-table' to current buffer."
   (dolist (lang-script gw-lang-script)
     (insert "languagesystem " (cdr lang-script) " " (car lang-script) ";\n"))
   (let ((vert-lang-table (gethash "vert" gw-feature-table)))
