@@ -215,11 +215,11 @@
 (defvar gw-list-cidinfo-file "HanaMin%s.cidinfo")
 
 (defvar gw-list-cidinfo-format
-  "FontName       (HanaMin$sub)
-FullName       (Hanazono Mincho %s)
+  "FontName       (HanaMin%s)
+FullName       (Hanazono Mincho %s Regular)
 FamilyName     (Hanazono Mincho %s)
 Weight         Regular
-version        ($version)
+version        (%s)
 Registry       (Adobe)
 Ordering       (Identity)
 Supplement     0
@@ -352,7 +352,7 @@ IsOS/2OBLIQUE              false
                               (format gw-list-sfont-component-format (car x) (cdr x)))
                             ranges "\n") t t))))))
 
-(defun gw-list-output-fmndbs-and-cidinfos ()
+(defun gw-list-output-fmndbs-and-cidinfos (version)
   "Output HanaMinXX.fmndb files."
   (dolist (entry gw-list-fmndb)
     (let* ((ps    (elt entry 0))
@@ -371,7 +371,7 @@ IsOS/2OBLIQUE              false
                  eng eng)))
       (with-temp-file (format gw-list-cidinfo-file ps)
         (insert
-         (format gw-list-cidinfo-format ps eng))))))
+         (format gw-list-cidinfo-format ps eng eng version))))))
 
 (defun gw-list (argv)
   "Non interactive output to files.  ARGV is version."
@@ -379,7 +379,7 @@ IsOS/2OBLIQUE              false
   (gw-list-load-dump-newest)
   (gw-list-output-files)
   (gw-list-output-sfonts (car argv))
-  (gw-list-output-fmndbs-and-cidinfos))
+  (gw-list-output-fmndbs-and-cidinfos (car argv)))
 
 (when noninteractive
   (message "invoking from script")
