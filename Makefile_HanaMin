@@ -4,7 +4,7 @@ PROG	= .
 PERL    = perl
 SCRIPTS = $(HOME)/.ghq/github.com/adobe-type-tools/perl-scripts
 PS2PDF  = ps2pdf
-version = $(shell date "+%y.%m%d" | cut -c2-6)
+version = $(shell date "+%y.%j")
 sub	= A
 # If you set "-S" to the following variable, makeotf will subroutinze, but it will take a long time.
 subrtnz =
@@ -39,8 +39,9 @@ dump_all_versions.txt dump_newest_only.txt: dump.tar.gz
 # ---
 
 # 下記は HanaMinXX.sfont も作成。
-$(BASE).list $(BASE).fmndb: Blocks.txt dump_newest_only.txt
+$(BASE).list $(BASE).fmndb $(BASE).cidinfo: Blocks.txt dump_newest_only.txt
 	emacs --script $(PROG)/gw-list.el $(version)
+#	cask exec emacs --script $(PROG)/gw-list.el $(version)
 
 # 空白文字を追記し、ufff[ef]を削除。
 $(BASE).map $(BASE).alias $(BASE).source: dump_all_versions.txt dump_newest_only.txt $(BASE).list
@@ -60,10 +61,6 @@ $(BASE).pfa: $(BASE).svg HalfwidthGlyphs.txt NonSpacingGlyphs-Halfwidth.txt
 
 $(BASE).dump: $(BASE).pfa
 	tx -dump $(BASE).pfa > $(BASE).dump
-
-$(BASE).cidinfo:
-	sed -e s/\$$sub/$(sub)/ -e s/\$$version/$(version)/ \
-	  $(PROG)/template.cidinfo > $(BASE).cidinfo
 
 $(BASE).cmap $(BASE).ivs $(BASE).cidmap $(BASE).features $(BASE).html: $(BASE).map $(BASE).alias $(BASE).dump
 	emacs --script $(PROG)/gw-afdko.el $(BASE) >>$(BASE).log 2>>$(BASE).err

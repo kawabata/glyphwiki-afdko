@@ -34,7 +34,8 @@
     ("ExA1" "Ex A1"  "Ex A1")
     ("ExA2" "Ex A2"  "Ex A2")
     ("ExB"  "Ex B"   "Ex B" )
-    ("ExC"  "Ex C"   "Ex C" )))
+    ("ExC"  "Ex C"   "Ex C" ))
+  "PS Name, Eng Name, JPN Name.")
 
 (defvar gw-list-sfont-range
   '(("HanaMin" "Hanazono Mincho"
@@ -42,8 +43,8 @@
       ("HanaMinB" . "[\\u20000-\\u2A6D6]")
       ("HanaMinC" . "[\\u2A700-\\u2FFFD]")))
     ("HanaMinEx" "Hanazono Mincho Ex"
-     (("HanaMinExA1" . "[[\\u0000-\\u4DFF][\\uA000-\\uD7FF][\\uE000-\\uFFFD][\\u10000-u1FFFD]]")
-      ("HanaMinExA2" . "[\\u4E00-\\u9FFF]")
+     (("HanaMinExA1" . "[[\\u0000-\\u007F][\\u4E00-\\u9FFF]]")
+      ("HanaMinExA2" . "[[\\u0080-\\u4DFF][\\uA000-\\uD7FF][\\uE000-\\uFFFD][\\u10000-u1FFFD]]")
       ("HanaMinExB" . "[\\u20000-\\u2A6D6]")
       ("HanaMinExC" . "[\\u2A700-\\u2FFFD]")))))
 
@@ -211,6 +212,24 @@
 			<UnicodeCharSet uset=\"%s\" />
 		</ComponentDef>")
 
+(defvar gw-list-cidinfo-file "HanaMin%s.cidinfo")
+
+(defvar gw-list-cidinfo-format
+  "FontName       (HanaMin$sub)
+FullName       (Hanazono Mincho %s)
+FamilyName     (Hanazono Mincho %s)
+Weight         Regular
+version        ($version)
+Registry       (Adobe)
+Ordering       (Identity)
+Supplement     0
+AdobeCopyright (Copyright 2002-2018 GlyphWiki PROJECT)
+
+PreferOS/2TypoMetrics      true
+IsOS/2WidthWeigthSlopeOnly true
+IsOS/2OBLIQUE              false
+")
+
 ;; code
 
 (defun gw-list-load-blocks ()
@@ -333,7 +352,7 @@
                               (format gw-list-sfont-component-format (car x) (cdr x)))
                             ranges "\n") t t))))))
 
-(defun gw-list-output-fmndbs ()
+(defun gw-list-output-fmndbs-and-cidinfos ()
   "Output HanaMinXX.fmndb files."
   (dolist (entry gw-list-fmndb)
     (let* ((ps    (elt entry 0))
@@ -349,7 +368,10 @@
                  ps
                  ucs ucs
                  sjis sjis
-                 eng eng))))))
+                 eng eng)))
+      (with-temp-file (format gw-list-cidinfo-file ps)
+        (insert
+         (format gw-list-cidinfo-format ps eng))))))
 
 (defun gw-list (argv)
   "Non interactive output to files.  ARGV is version."
@@ -357,7 +379,7 @@
   (gw-list-load-dump-newest)
   (gw-list-output-files)
   (gw-list-output-sfonts (car argv))
-  (gw-list-output-fmndbs))
+  (gw-list-output-fmndbs-and-cidinfos))
 
 (when noninteractive
   (message "invoking from script")
