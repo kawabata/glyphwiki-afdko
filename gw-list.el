@@ -212,6 +212,24 @@
 			<UnicodeCharSet uset=\"%s\" />
 		</ComponentDef>")
 
+(defvar gw-list-cidinfo-file "HanaMin%s.cidinfo")
+
+(defvar gw-list-cidinfo-format
+  "FontName       (HanaMin$sub)
+FullName       (Hanazono Mincho %s)
+FamilyName     (Hanazono Mincho %s)
+Weight         Regular
+version        ($version)
+Registry       (Adobe)
+Ordering       (Identity)
+Supplement     0
+AdobeCopyright (Copyright 2002-2018 GlyphWiki PROJECT)
+
+PreferOS/2TypoMetrics      true
+IsOS/2WidthWeigthSlopeOnly true
+IsOS/2OBLIQUE              false
+")
+
 ;; code
 
 (defun gw-list-load-blocks ()
@@ -334,7 +352,7 @@
                               (format gw-list-sfont-component-format (car x) (cdr x)))
                             ranges "\n") t t))))))
 
-(defun gw-list-output-fmndbs ()
+(defun gw-list-output-fmndbs-and-cidinfos ()
   "Output HanaMinXX.fmndb files."
   (dolist (entry gw-list-fmndb)
     (let* ((ps    (elt entry 0))
@@ -350,7 +368,10 @@
                  ps
                  ucs ucs
                  sjis sjis
-                 eng eng))))))
+                 eng eng)))
+      (with-temp-file (format gw-list-cidinfo-file ps)
+        (insert
+         (format gw-list-cidinfo-format ps eng))))))
 
 (defun gw-list (argv)
   "Non interactive output to files.  ARGV is version."
@@ -358,7 +379,7 @@
   (gw-list-load-dump-newest)
   (gw-list-output-files)
   (gw-list-output-sfonts (car argv))
-  (gw-list-output-fmndbs))
+  (gw-list-output-fmndbs-and-cidinfos))
 
 (when noninteractive
   (message "invoking from script")
