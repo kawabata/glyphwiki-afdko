@@ -21,8 +21,14 @@ work	= ./$(BASE).work
 dump.tar.gz:
 	wget http://glyphwiki.org/dump.tar.gz
 
-HalfwidthGlyphs.txt:
-	wget -O HalfwidthGlyphs.txt 'http://glyphwiki.org/get_source.cgi?name=Group:HalfwidthGlyphs'
+HalfwidthGlyphs-BMP.txt:
+	wget -O HalfwidthGlyphs-BMP.txt 'http://glyphwiki.org/get_source.cgi?name=Group:HalfwidthGlyphs-BMP'
+
+HalfwidthGlyphs-SMP.txt:
+	wget -O HalfwidthGlyphs-SMP.txt 'http://glyphwiki.org/get_source.cgi?name=Group:HalfwidthGlyphs-SMP'
+
+HalfwidthGlyphs-nonUCS.txt:
+	wget -O HalfwidthGlyphs-nonUCS.txt 'http://glyphwiki.org/get_source.cgi?name=Group:HalfwidthGlyphs-nonUCS'
 
 NonSpacingGlyphs-Halfwidth.txt:
 	wget -O NonSpacingGlyphs-Halfwidth.txt 'http://glyphwiki.org/get_source.cgi?name=Group:NonSpacingGlyphs-Halfwidth'
@@ -55,7 +61,7 @@ $(BASE).svg: $(BASE).source
 	for file in $(work)/*.svg; do $(PERL) unionpoly.pl $$file; done
 	$(PERL) $(PROG)/makeSVGFont.pl $(BASE) >$(BASE).log 2>$(BASE).err
 
-$(BASE).pfa: $(BASE).svg HalfwidthGlyphs.txt NonSpacingGlyphs-Halfwidth.txt
+$(BASE).pfa: $(BASE).svg HalfwidthGlyphs-BMP.txt HalfwidthGlyphs-SMP.txt HalfwidthGlyphs-nonUCS.txt NonSpacingGlyphs-Halfwidth.txt
 	ruby makeSVG-half.rb $(BASE).svg $(BASE).map
 	tx -t1 $(BASE).svg $(BASE).pfa >>$(BASE).log 2>>$(BASE).err
 
@@ -70,12 +76,12 @@ $(BASE).cmap $(BASE).ivs $(BASE).cidmap $(BASE).features $(BASE).html: $(BASE).m
 	mv $(BASE).tmp.cmap $(BASE).cmap
 
 $(BASE).raw: $(BASE).cidinfo $(BASE).cidmap $(BASE).pfa
-	mergeFonts -cid $(BASE).cidinfo $(BASE).raw $(BASE).cidmap $(BASE).pfa >>$(BASE).log 2>>$(BASE).err
+	mergefonts -cid $(BASE).cidinfo $(BASE).raw $(BASE).cidmap $(BASE).pfa >>$(BASE).log 2>>$(BASE).err
 #	checkOutlines -e -k -O -x $(BASE).pfa >/dev/null 2>>$(BASE).err
 
 $(BASE).hinted.raw: $(BASE).raw
 	$(PERL) $(SCRIPTS)/hintcidfont.pl $(PROG)/hintparam.txt < $(BASE).raw > $(BASE).hinted.raw
-	autohint -r -q $(BASE).hinted.raw >>$(BASE).log 2>>$(BASE).err
+	psautohint $(BASE).hinted.raw >>$(BASE).log 2>>$(BASE).err
 
 $(BASE).otf: $(BASE).fmndb $(BASE).ivs $(BASE).cmap $(BASE).hinted.raw $(BASE).features
 	makeotf $(subrtnz) -newNameID4 -mf $(BASE).fmndb -cs 1 -ci	\
