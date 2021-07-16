@@ -108,7 +108,7 @@
     ("Katakana Phonetic Extensions" "Y" nil nil nil "X" "X" nil nil)
     ("Enclosed CJK Letters and Months" "Y" nil nil nil "X" "X" nil nil)
     ("CJK Compatibility" "Y" nil nil nil "X" "X" nil nil)
-    ("CJK Unified Ideographs Extension A" "Y" nil nil nil nil "X" nil nil)
+    ("CJK Unified Ideographs Extension A" nil "Y" nil nil nil "X" nil nil)
     ("Yijing Hexagram Symbols" "Y" nil nil nil nil "X" nil nil)
     ("CJK Unified Ideographs" "Y" nil nil nil "X" nil nil nil)
     ("Cyrillic Extended-B" "Y" nil nil nil nil "X" nil nil)

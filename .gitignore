@@ -4,6 +4,9 @@ dump.tar.gz
 dump_newest_only.txt
 dump_all_versions.txt
 GlyphWiki-UTF*
-HalfWidthGlyphs.txt
 Blocks.txt
 gw-list.wiki
+HalfwidthGlyphs-BMP.txt
+HalfwidthGlyphs-nonUCS.txt
+HalfwidthGlyphs-SMP.txt
+NonSpacingGlyphs-Halfwidth.txt
