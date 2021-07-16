@@ -77,7 +77,7 @@ These fonts also cover all variants of
 
 Run the following command to create the newest font. Please make sure
 that you install all required software, set up Perl library environment
-variables, set the $(AFDKO) environment variable to the installation
+variables, set the $(SCRIPTS) variable to the installation
 directory of AFDKO perl scripts.
 
     git clone http://github.com/kawabata/glyphwiki-afdko
@@ -86,6 +86,16 @@ directory of AFDKO perl scripts.
     git submodule update
     «check Makefile/Makefile_HanaMin settings»
     make
+
+You can also build in a Docker container to make it easier to install
+the dependencies like this:
+
+    git clone http://github.com/kawabata/glyphwiki-afdko
+    cd glyphwiki-afdko
+    git submodule init
+    git submodule update
+    docker build -t gw-afdko .
+    docker run -v "$PWD:/code" -w /code gw-afdko make
 
 This will download "dump.tar.gz" from GlyphWiki web site and create
 the fonts. It may take several hours (depends on your machine power),
