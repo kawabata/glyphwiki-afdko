@@ -2,7 +2,7 @@
 
 PROG	= .
 PERL    = perl
-SCRIPTS = $(HOME)/.ghq/github.com/adobe-type-tools/perl-scripts
+SCRIPTS = /opt/perl-scripts
 PS2PDF  = ps2pdf
 version = $(shell date "+%y.%j")
 sub	= A
